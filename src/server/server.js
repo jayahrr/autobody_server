@@ -1,15 +1,12 @@
-// BASE SETUP
-// =============================================================================
-
 // call the packages we need
 const express     = require('express'),
   path            = require('path'),
   bodyParser      = require('body-parser'),
   morgan          = require('morgan'),
-  // call the Router object
   { router }      = require('./routers/router'),
   { login }       = require('./routers/login'),
   { authenticate }= require('./middleware/authenticate'),
+  port = process.env.PORT || 3000,
 
   app = express()
 
@@ -43,7 +40,7 @@ app.get( '/customers/me', authenticate, ( req, res ) => {
 
 
 // START WEB APP -------------------------------------
-const server = app.listen( 3000, () => {
+const server = app.listen( port, () => {
   const { address, port } = server.address()  
   console.log( `Server is up at http://${ address }:${ port }` )
 })
