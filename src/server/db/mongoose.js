@@ -3,6 +3,6 @@ const mongoose  = require('mongoose'),
   Schema        = mongoose.Schema
 
 mongoose.Promise = global.Promise
-mongoose.connect( 'mongodb://localhost:27017/AutoBuddyApp' )
+mongoose.connect( process.env.MONGODB_URI || 'mongodb://localhost:27017/AutoBuddyApp' )
 
 module.exports = { mongoose, extend, Schema }

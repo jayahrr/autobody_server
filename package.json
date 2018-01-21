@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/server/server.js",
+    "start-watch": "nodemon --exec \"npm start\"",
     "test": "mocha **/*.test.js"
+  },
+  "engines": {
+    "node": "9.3.0"
   },
   "keywords": [],
   "author": "",
