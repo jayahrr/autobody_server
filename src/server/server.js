@@ -4,6 +4,8 @@ require('./config/config')
 const express     = require('express'),
   bodyParser      = require('body-parser'),
   morgan          = require('morgan'),
+  path            = require('path'),
+  publicPath      = path.join(__dirname, '../client'),
   { router }      = require('./routers/router'),
   { login }       = require('./routers/login'),
   { logout }      = require('./routers/logout'),
@@ -12,30 +14,29 @@ const express     = require('express'),
 
   app = express()
 
+// serve up the public files
+app.use( express.static( publicPath ))
 // configure app to use bodyParser()
 // this will let us get the data from a POST
 app.use( bodyParser.urlencoded({ extended: true }))
 app.use( bodyParser.json() )
 // configure app to use mogran
 // this logger will output all requests into the console
-app.use(morgan( 'combined' ))
+app.use( morgan( 'combined' ))
 
 
 
 // REGISTER OUR ROUTES -------------------------------
 
-// all of our routes will be prefixed with /api
 app.use( '/api', router )
 app.use( '/login', login )
 app.use( '/logout', logout )
 
-// Homepage
-app.get( '/', (req, res) => { res.send( '<h1>Hello Express!</h1>' )})
-
 // Bad Request page
-app.get( '/bad', (req, res) => { res.send( '<h1>Bad Request!</h1>' )})
-
-
+app.get( '/bad', (req, res) => { 
+  res.send( '<h1>Bad Request!</h1>' )
+})
+// Profile page
 app.get( '/customers/me', authenticate, ( req, res ) => {
   res.send( req.person )
 })

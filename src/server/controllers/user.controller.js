@@ -35,7 +35,7 @@ exports.create = ( req, res ) => {
 exports.listAll = ( req, res ) => {
   checkVersion( req.params.version, '1', res )
   Customer.find().then(( docs ) => {
-    res.send({ message: `Returning ${ docs.length } item(s)`, docs })
+    res.send( docs )
   }).catch(( e ) => 
     res.status( 400 ).send( apiErrorMsg( 'get', 'customers', e )))
 }
