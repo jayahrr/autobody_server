@@ -1,13 +1,14 @@
+require('./config/config')
+
 // call the packages we need
 const express     = require('express'),
-  path            = require('path'),
   bodyParser      = require('body-parser'),
   morgan          = require('morgan'),
   { router }      = require('./routers/router'),
   { login }       = require('./routers/login'),
   { logout }      = require('./routers/logout'),
   { authenticate }= require('./middleware/authenticate'),
-  port = process.env.PORT || 3000,
+  port = process.env.PORT,
 
   app = express()
 
