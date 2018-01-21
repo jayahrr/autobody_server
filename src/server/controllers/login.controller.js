@@ -7,7 +7,13 @@ exports.customers = ( req, res ) => {
     return res.status( 400 ).send({ message: 'Missing required parameter(s)'})
   }
   User.findByCredentials( body.username, body.password ).then(( user ) => {
-    res.send( user )
+    if ( user.tokens.length === 0 ) {
+      return user.generateAuthToken()
+    } else {
+      return res.send({ message: 'This account is already logged in' })
+    }
+  }).then(( token ) => {
+    res.status( 201 ).header( 'x-auth', token ).send()
   }).catch(() => {
     res.status( 400 ).send()
   })

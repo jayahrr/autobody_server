@@ -5,6 +5,7 @@ const express     = require('express'),
   morgan          = require('morgan'),
   { router }      = require('./routers/router'),
   { login }       = require('./routers/login'),
+  { logout }      = require('./routers/logout'),
   { authenticate }= require('./middleware/authenticate'),
   port = process.env.PORT || 3000,
 
@@ -25,6 +26,7 @@ app.use(morgan( 'combined' ))
 // all of our routes will be prefixed with /api
 app.use( '/api', router )
 app.use( '/login', login )
+app.use( '/logout', logout )
 
 // Homepage
 app.get( '/', (req, res) => { res.send( '<h1>Hello Express!</h1>' )})

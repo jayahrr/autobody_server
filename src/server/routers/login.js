@@ -9,7 +9,7 @@ const login = express.Router()         // get an instance of the express Router
 
 // test route to make sure everything is working (accessed at GET http://:::3000/api)
 login.get( '/', function( req, res ) {
-  res.json({ message: 'hooray! welcome to our login site!' })   
+  res.json({ message: 'hooray! welcome to our login site!' })
 })
 
 
@@ -20,7 +20,7 @@ login.get( '/', function( req, res ) {
 login.route( '/customers' )
 
   .post( LOGIN.customers )
-  .get((req, res) => { res.send( '<h1>Customer login page!</h1>' )})
+  .get(( req, res ) => { res.send( '<h1>Customer login page!</h1>' )})
 
 
 // ----------------------------------------------------
@@ -29,6 +29,6 @@ login.route( '/customers' )
 login.route( '/service_providers' )
 
   .post( LOGIN.serviceProviders )
-  .get((req, res) => { res.send( '<h1>Service Provider login page!</h1>' )})
+  .get(( req, res ) => { res.send( '<h1>Service Provider login page!</h1>' )})
 
 module.exports = { login }

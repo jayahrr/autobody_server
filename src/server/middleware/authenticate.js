@@ -1,14 +1,14 @@
 const { Customer } = require('./../models/user.model')
 
-var authenticate = ( req, res, next ) => {
-  var token = req.header( 'x-auth' )
+const authenticate = ( req, res, next ) => {
+  const token = req.header( 'x-auth' )
 
-  Customer.findByToken( token ).then(( person ) => {
-    if ( !person ) {
+  Customer.findByToken( token ).then(( user ) => {
+    if ( !user ) {
       return Promise.reject()
     }
 
-    req.person = person
+    req.user = user
     req.token = token
     next()
   }).catch(() => {
