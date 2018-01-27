@@ -6,9 +6,6 @@ const express     = require('express'),
   morgan          = require('morgan'),
   path            = require('path'),
   publicPath      = path.join(__dirname, '../client'),
-  { router }      = require('./routers/router'),
-  { login }       = require('./routers/login'),
-  { logout }      = require('./routers/logout'),
   { authenticate }= require('./middleware/authenticate'),
   port = process.env.PORT,
 
@@ -28,9 +25,9 @@ app.use( morgan( 'combined' ))
 
 // REGISTER OUR ROUTES -------------------------------
 
-app.use( '/api', router )
-app.use( '/login', login )
-app.use( '/logout', logout )
+app.use( '/api', require('./routers/api') )
+app.use( '/login', require('./routers/login') )
+app.use( '/logout', require('./routers/logout') )
 
 // Bad Request page
 app.get( '/bad', (req, res) => { 

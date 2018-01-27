@@ -10,7 +10,7 @@ exports.customers = ( req, res ) => {
     if ( user.tokens.length === 0 ) {
       return user.generateAuthToken()
     } else {
-      return res.send({ message: 'This account is already logged in' })
+      return res.status( 400 ).header( 'x-auth', user.tokens[0].token ).send({ message: 'This account is already logged in' })
     }
   }).then(( token ) => {
     res.status( 201 ).header( 'x-auth', token ).send()

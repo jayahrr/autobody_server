@@ -46,24 +46,58 @@ const VehicleInstanceSchema = BaseSchema.extend({
   }]
 }, { collections: 'vehicle_instance' })
 
-VehicleInstanceSchema.pre('save', function (next) {
-  if (!this.current_location && this.owner.primary_location) this.current_location = this.owner.primary_location
+VehicleInstanceSchema.pre('save', function( next ) {
+  if (!this.current_location && this.owner.primary_location) {
+    this.current_location = this.owner.primary_location
+  }
   next()
 })
 
-VehicleInstanceSchema.post('save', function (doc) {
-  if (this.vehicle) {
-    Vehicle.findById(this.vehicle).exec((err, vehicle) => {
-      if (err) return handleError(err)
-      vehicle.vehicle_instances.push(this._id)
-      vehicle.save((err) => {if(err) console.log('Unable to update vehicle object with new instance', err)})
+VehicleInstanceSchema.pre( 'remove', function( next ) {
+  let vehicleInstance = this
+  function findAMatchAndSplice ( doc ) {
+    var instance
+    for ( instance = 0; instance < doc.vehicle_instances.length; instance++ ) {
+      if ( doc.vehicle_instances[instance] == vehicleInstance.id ) {
+        doc.vehicle_instances.splice( instance, 1 )
+        doc.save().catch(( e ) => console.log( 'Something went wrong removing owner ids!', e ))
+      }
+    }
+  }
+
+  if ( vehicleInstance.owner ) {
+    Customer.findByIdAndUpdate( vehicleInstance.owner ).exec( function ( err, doc ) {
+      findAMatchAndSplice( doc )
     })
   }
-  if (this.owner) {
-    Customer.findById(this.owner).exec(function (err, customer) {
-      if (err) return handleError(err)
-      customer.vehicle_instances.push(this._id)
-      customer.save((err) => {if(err) console.log('Unable to update customer object with new instance', err)})
+
+  if ( vehicleInstance.vehicle ) {
+    Vehicle.findByIdAndUpdate( vehicleInstance.vehicle ).exec( function ( err, doc ) {
+      findAMatchAndSplice( doc )
+    })
+  }
+
+  next()
+})
+
+VehicleInstanceSchema.post( 'save', function() {
+  let vehicleInstance = this
+
+  if ( vehicleInstance.vehicle ) {
+    Vehicle.findById( vehicleInstance.vehicle ).exec( function( err, vehicle ) {
+      vehicle.vehicle_instances.push( vehicleInstance._id )
+      vehicle.save(( err ) => {
+        if( err ) console.log('Unable to update vehicle object with new instance', err)
+      })
+    })
+  }
+
+  if ( vehicleInstance.owner ) {
+    Customer.findById( vehicleInstance.owner ).exec( function( err, customer ) {
+      customer.vehicle_instances.push( vehicleInstance._id )
+      customer.save(( err ) => {
+        if( err ) console.log('Unable to update customer object with new instance', err)
+      })
     })
   }
 })

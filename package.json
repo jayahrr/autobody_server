@@ -24,6 +24,7 @@
     "mongoose": "^5.0.0-rc0",
     "mongoose-schema-extend": "^0.2.2",
     "morgan": "^1.9.0",
+    "update-notifier": "^2.3.0",
     "validator": "^9.2.0",
     "yargs": "^10.0.3"
   },
