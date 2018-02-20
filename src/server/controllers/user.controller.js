@@ -100,29 +100,17 @@ exports.findByIdAndRemove = (req, res) => {
 
 // GET find a Customer's Vehicle Instances
 exports.findMyVehicles = (req, res) => {
-  const username = req.header('x-un')
+  const owner = req.header('x-un')
 
-  console.log(username)
-
-  Customer.find({ username })
-    .then(customer => {
-      const id = customer[0]._id
-
-      VehicleInstance.find({ owner: id })
-        .then(myVehicles => {
-          if (!myVehicles) {
-            return res.send('You have no vehicles')
-          }
-          res.json(myVehicles)
-        })
-        .catch(e =>
-          res
-            .status(400)
-            .send(apiErrorMsg('get', 'vehicleInstance by Customer', e))
-        )
+  VehicleInstance.find({ owner })
+    .then(myVehicles => {
+      if (!myVehicles) {
+        return res.send('You have no vehicles')
+      }
+      res.json(myVehicles)
     })
     .catch(e =>
-      res.status(400).send(apiErrorMsg('get', 'customer by Username', e))
+      res.status(400).send(apiErrorMsg('get', 'vehicleInstance by Customer', e))
     )
 }
 
