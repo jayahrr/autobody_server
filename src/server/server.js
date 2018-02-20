@@ -33,10 +33,6 @@ app.use( '/logout', require('./routers/logout') )
 app.get( '/bad', (req, res) => { 
   res.send( '<h1>Bad Request!</h1>' )
 })
-// Profile page
-app.get( '/customers/me', authenticate, ( req, res ) => {
-  res.send( req.person )
-})
 
 
 
@@ -45,3 +41,5 @@ const server = app.listen( port, () => {
   const { address, port } = server.address()  
   console.log( `Server is up at http://${ address }:${ port }` )
 })
+
+module.exports.app = server

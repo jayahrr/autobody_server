@@ -2,7 +2,7 @@ const { mongoose, extend } = require('../db/mongoose')
 const { BaseSchema } = require('./base')
 
 // Create the Service Category Schema
-const ServiceCategorySchema = BaseSchema.extend({
+const CatalogCategorySchema = BaseSchema.extend({
   active: {
     type: Boolean,
     default: true
@@ -21,9 +21,9 @@ const ServiceCategorySchema = BaseSchema.extend({
     default: ''
   },
   image: Buffer
-}, { collections: 'service_category' })
+}, { collections: 'catalog_category' })
 
 // Create the Service Category Model
-const ServiceCategory = mongoose.model('service_category', ServiceCategorySchema)
+const CatalogCategory = mongoose.model( 'catalog_category', CatalogCategorySchema )
 
-module.exports = { ServiceCategory }
+module.exports = { CatalogCategory }

@@ -1,4 +1,4 @@
-const { mongoose, extend, Schema } = require('../db/mongoose')
+const { mongoose, Schema } = require('../db/mongoose')
 const { BaseSchema } = require('./base')
 const { Vehicle } = require('./vehicle.model')
 const { Customer } = require('./user.model')

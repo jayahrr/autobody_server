@@ -1,17 +1,23 @@
-const { mongoose, extend, Schema } = require('../db/mongoose')
-const { BaseSchema } = require('./base')
+const { mongoose, extend, Schema } = require('../db/mongoose'),
+  { BaseSchema } = require('./base'),
+  { VehicleInstance } = require('./vehicleInstance.model')
+
 
 // Create the Service Instance Schema
-const ServiceInstanceInstanceSchema = BaseSchema.extend({
+const ServiceInstanceSchema = BaseSchema.extend({
   active: {
     type: Boolean,
     default: true
   },
-  service: {
+  catalog_item: {
     type: Schema.ObjectId,
-    ref: 'service',
+    ref: 'catalog_item',
     required: true,
     minlength: 1
+  },
+  category: {
+    type: Schema.ObjectId,
+    ref: 'catalog_item'
   },
   service_provider: {
     type: Schema.ObjectId,
@@ -38,7 +44,25 @@ const ServiceInstanceInstanceSchema = BaseSchema.extend({
   }
 }, { collections: 'service_instance' })
 
+ServiceInstanceSchema.pre('save', function ( next ) {
+  let serviceInstance = this
+  serviceInstance.catalog_category = serviceInstance.catalog_item.category
+  
+  next()
+})
+
+ServiceInstanceSchema.post( 'save', function( next ) {
+  let serviceInstance = this
+
+  if ( serviceInstance.vehicle_instance ) {
+    VehicleInstance.findByIdAndUpdate( serviceInstance.vehicle_instance, { services: [ serviceInstance._id ]} )
+      .catch((e) => {console.log(e)})
+  }
+
+  next()
+})
+
 // Create the Service Instance Model
-const ServiceInstance = mongoose.model('service_instance', ServiceInstanceInstanceSchema)
+const ServiceInstance = mongoose.model('service_instance', ServiceInstanceSchema)
 
 module.exports = { ServiceInstance }
