@@ -41,7 +41,6 @@ exports.create = (req, res) => {
       res.status(201).json(doc)
     })
     .catch(e => {
-      console.log(e)
       return res.status(400).send(apiErrorMsg('post', 'vehicle instance', e))
     })
 }
@@ -80,6 +79,34 @@ exports.findById = (req, res) => {
     )
 }
 
+// PUT    update a vehicle instance by id
+exports.findByIdAndUpdate = (req, res) => {
+  const id = req.params.id
+  if (!id) {
+    return res.status(400).send('No ID specified')
+  }
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(400).send('Invalid ID')
+  }
+
+  var body = _.pick(req.body, ['name', 'vin', 'year', 'make', 'model'])
+  if (!body.name) {
+    return res.status(400).send('Missing required parameter(s)')
+  }
+
+  VehicleInstance.findByIdAndUpdate(id, body)
+    .then(doc => {
+      if (!doc) {
+        return res.status(400).send('Unable to find Vehicle Instance by ID')
+      }
+      res.json(doc)
+    })
+    .catch(e =>
+      res.status(400).send(apiErrorMsg('get', 'vehicle instance by ID', e))
+    )
+}
+
 // DELETE delete a vehicle instance by id
 exports.findByIdAndRemove = (req, res) => {
   const id = req.params.id
@@ -103,20 +130,4 @@ exports.findByIdAndRemove = (req, res) => {
         .catch(e => res.status(400).send(e))
     })
     .catch(e => res.status(400).send(e))
-}
-
-// POST create a Customer's Vehicle Instance
-exports.createMyVehicle = (req, res) => {
-  var body = _.pick(req.body, [
-    'name',
-    'vin',
-    'owner',
-    'vehicleInfo',
-    'currentLocation'
-  ])
-  if (!body.name || !body.owner) {
-    return res.status(400).send('Missing required parameter(s)')
-  }
-
-  console.log(username)
 }

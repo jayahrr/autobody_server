@@ -102,30 +102,6 @@ VehicleInstanceSchema.pre('remove', function(next) {
   next()
 })
 
-// VehicleInstanceSchema.post('save', function() {
-//   let vehicleInstance = this
-
-//   if (vehicleInstance.vehicle) {
-//     Vehicle.findById(vehicleInstance.vehicle).exec(function(err, vehicle) {
-//       vehicle.vehicle_instances.push(vehicleInstance._id)
-//       vehicle.save(err => {
-//         if (err)
-//           console.log('Unable to update vehicle object with new instance', err)
-//       })
-//     })
-//   }
-
-//   if (vehicleInstance.owner) {
-//     Customer.findById(vehicleInstance.owner).exec(function(err, customer) {
-//       customer.vehicle_instances.push(vehicleInstance._id)
-//       customer.save(err => {
-//         if (err)
-//           console.log('Unable to update customer object with new instance', err)
-//       })
-//     })
-//   }
-// })
-
 // Create the Vehicle Instance Model
 const VehicleInstance = mongoose.model(
   'vehicle_instance',

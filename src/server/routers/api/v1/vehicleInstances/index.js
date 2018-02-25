@@ -20,5 +20,6 @@ router
 
   .get(VEHICLEINSTANCES.findById)
   .delete(VEHICLEINSTANCES.findByIdAndRemove)
+  .put(VEHICLEINSTANCES.findByIdAndUpdate)
 
 module.exports = router
