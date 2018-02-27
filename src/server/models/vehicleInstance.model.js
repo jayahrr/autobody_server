@@ -51,17 +51,17 @@ const VehicleInstanceSchema = BaseSchema.extend(
     services: [
       {
         type: Schema.ObjectId,
-        ref: 'service_instance'
+        ref: 'VehicleInstances'
       }
     ],
     last_services: [
       {
         type: Schema.ObjectId,
-        ref: 'service_instance'
+        ref: 'VehicleInstances'
       }
     ]
   },
-  { collections: 'vehicle_instance' }
+  { collection: 'VehicleInstances' }
 )
 
 VehicleInstanceSchema.pre('save', function(next) {
@@ -71,36 +71,36 @@ VehicleInstanceSchema.pre('save', function(next) {
   next()
 })
 
-VehicleInstanceSchema.pre('remove', function(next) {
-  let vehicleInstance = this
-  function findAMatchAndSplice(doc) {
-    var instance
-    for (instance = 0; instance < doc.vehicle_instances.length; instance++) {
-      if (doc.vehicle_instances[instance] == vehicleInstance.id) {
-        doc.vehicle_instances.splice(instance, 1)
-        doc
-          .save()
-          .catch(e =>
-            console.log('Something went wrong removing owner ids!', e)
-          )
-      }
-    }
-  }
+// VehicleInstanceSchema.pre('remove', function(next) {
+//   let vehicleInstance = this
+//   function findAMatchAndSplice(doc) {
+//     var instance
+//     for (instance = 0; instance < doc.vehicle_instances.length; instance++) {
+//       if (doc.vehicle_instances[instance] == vehicleInstance.id) {
+//         doc.vehicle_instances.splice(instance, 1)
+//         doc
+//           .save()
+//           .catch(e =>
+//             console.log('Something went wrong removing owner ids!', e)
+//           )
+//       }
+//     }
+//   }
 
-  if (vehicleInstance.owner) {
-    Customer.findByIdAndUpdate(vehicleInstance.owner).exec(function(err, doc) {
-      findAMatchAndSplice(doc)
-    })
-  }
+//   if (vehicleInstance.owner) {
+//     Customer.findByIdAndUpdate(vehicleInstance.owner).exec(function(err, doc) {
+//       findAMatchAndSplice(doc)
+//     })
+//   }
 
-  if (vehicleInstance.vehicle) {
-    Vehicle.findByIdAndUpdate(vehicleInstance.vehicle).exec(function(err, doc) {
-      findAMatchAndSplice(doc)
-    })
-  }
+//   if (vehicleInstance.vehicle) {
+//     Vehicle.findByIdAndUpdate(vehicleInstance.vehicle).exec(function(err, doc) {
+//       findAMatchAndSplice(doc)
+//     })
+//   }
 
-  next()
-})
+//   next()
+// })
 
 // Create the Vehicle Instance Model
 const VehicleInstance = mongoose.model(

@@ -1,8 +1,8 @@
 const { mongoose, Schema } = require('../db/mongoose')
 const { BaseSchema } = require('./base')
 
-// Create the Service Category Schema
-const CatalogCategorySchema = BaseSchema.extend(
+// Create the Service Catalog Schema
+const CatalogSchema = BaseSchema.extend(
   {
     active: {
       type: Boolean,
@@ -10,7 +10,7 @@ const CatalogCategorySchema = BaseSchema.extend(
     },
     order: {
       type: Number,
-      default: ''
+      default: 0
     },
     title: {
       type: String,
@@ -21,28 +21,14 @@ const CatalogCategorySchema = BaseSchema.extend(
       type: String,
       default: ''
     },
-    thumbnail: Buffer,
     type: {
       type: String,
-      default: 'category'
+      default: 'catalog'
     },
-    catalog: {
-      ref: 'Catalog',
-      type: Schema.ObjectId
-    },
+    thumbnail: Buffer,
     child_categories: [
       {
         category_id: { ref: 'Catalog', type: Schema.ObjectId }
-      }
-    ],
-    parent_categories: [
-      {
-        category_id: { ref: 'Catalog', type: Schema.ObjectId }
-      }
-    ],
-    items: [
-      {
-        catalog_item_id: { ref: 'Catalog', type: Schema.ObjectId }
       }
     ]
   },
@@ -50,9 +36,6 @@ const CatalogCategorySchema = BaseSchema.extend(
 )
 
 // Create the Service Category Model
-const CatalogCategory = mongoose.model(
-  'Catalog_category',
-  CatalogCategorySchema
-)
+const Catalog = mongoose.model('Catalog', CatalogSchema)
 
-module.exports = { CatalogCategory }
+module.exports = { Catalog }

@@ -1,28 +1,16 @@
 // call the packages we need
-const express      = require('express')
-  // VEHICLES         = require('./../controllers/vehicle.controller')
-  // VEHICLEINSTANCES = require('./../controllers/vehicleInstance.controller'),
-  // { authenticate }  = require('./../middleware/authenticate')
-
-
+const express = require('express')
+// VEHICLES         = require('./../controllers/vehicle.controller')
+// VEHICLEINSTANCES = require('./../controllers/vehicleInstance.controller'),
+// { authenticate }  = require('./../middleware/authenticate')
 
 // ROUTES FOR OUR API
 // =============================================================================
-const router = express.Router()         // get an instance of the express Router
+const router = express.Router() // get an instance of the express Router
 
-router.use( '/v1', require('./v1') )
-
-// test route to make sure everything is working (accessed at GET http://:::3000/api)
-// router.get( '/', function( req, res ) {
-//   res.json({ message: 'hooray! welcome to our api!' })   
-// })
-
-
-
-
+router.use('/v1', require('./v1'))
 
 // MAY JUST DELETE THE CONTENT BELOW. NOT SURE YET. 01252018
-
 
 // ----------------------------------------------------
 // on routes that end in /:version/customers/vehicleInstances
@@ -30,7 +18,6 @@ router.use( '/v1', require('./v1') )
 // router.route( '/:version/customers/vehicleInstances' )
 
 //   .get( authenticate, CUSTOMERS.findMyVehicles )
-
 
 // // Vehicles
 // // ----------------------------------------------------
@@ -50,7 +37,6 @@ router.use( '/v1', require('./v1') )
 //   .get( VEHICLES.findById )
 //   .delete( VEHICLES.findByIdAndRemove )
 
-
 // // Vehicle Instances
 // // ----------------------------------------------------
 // // on routes that end in /:version/vehicleInstances
@@ -68,6 +54,5 @@ router.use( '/v1', require('./v1') )
 
 //   .get( VEHICLEINSTANCES.findById )
 //   .delete( VEHICLEINSTANCES.findByIdAndRemove )
-
 
 module.exports = router
