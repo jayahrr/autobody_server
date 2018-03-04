@@ -39,7 +39,7 @@ exports.deleteAll = (req, res) => {
     .catch(e => res.status(400).send(apiErrorMsg('delete', 'catalogs', e)))
 }
 
-// GET    return a vehicle by id
+// GET    return a catalog by id
 exports.findById = (req, res) => {
   const id = req.params.id
   if (!id) {
@@ -60,7 +60,7 @@ exports.findById = (req, res) => {
     .catch(e => res.status(400).send(apiErrorMsg('get', 'catalog by ID', e)))
 }
 
-// DELETE delete a vehicle by id
+// DELETE delete a catalog by id
 exports.findByIdAndRemove = (req, res) => {
   const id = req.params.id
   if (!id) {
@@ -76,4 +76,34 @@ exports.findByIdAndRemove = (req, res) => {
       res.status(204).json(doc)
     })
     .catch(e => res.status(400).send(apiErrorMsg('delete', 'catalog by ID', e)))
+}
+
+// GET    list the entire catalog, including categories and items
+exports.full = (req, res) => {
+  // build the full catalog object
+  const full_catalog_object = {}
+  full_catalog_object.catalog = {}
+  full_catalog_object.categories = []
+  full_catalog_object.cat_items = []
+
+  Catalog.find({ active: true })
+    .then(docs =>
+      docs.forEach(doc => {
+        switch (doc.type) {
+        case 'catalog':
+          full_catalog_object.catalog = doc
+          break
+        case 'category':
+          full_catalog_object.categories.push(doc)
+          break
+        case 'cat_item':
+          full_catalog_object.cat_items.push(doc)
+          break
+        default:
+          break
+        }
+      })
+    )
+    .then(() => res.json(full_catalog_object))
+    .catch(e => res.status(400).send(apiErrorMsg('get', 'full catalog', e)))
 }

@@ -30,7 +30,7 @@ const RequestSchema = BaseSchema.extend(
       default: '4 - Low'
     },
     request_id: {
-      ref: 'Catalog',
+      ref: 'Requests',
       type: Schema.ObjectId
     },
     requester_vehicle_id: {

@@ -12,6 +12,7 @@ const app = require('./../server').app,
 
 const Customers = [
   {
+    _id: new ObjectID(),
     first_name: 'jane',
     last_name: 'smith',
     email: 'jane@example.com',
@@ -19,6 +20,7 @@ const Customers = [
     password: 'abc123'
   },
   {
+    _id: new ObjectID(),
     first_name: 'joe',
     last_name: 'smith',
     email: 'joe@example.com',
@@ -26,6 +28,7 @@ const Customers = [
     password: 'abc123'
   },
   {
+    _id: new ObjectID(),
     first_name: 'jack',
     last_name: 'smith',
     email: 'jack@example.com',
@@ -146,7 +149,7 @@ const Requests = [
 const RequestItems = [
   {
     _id: new ObjectID(),
-    number: 'REQ0001001',
+    number: 'RITM0001001',
     short_description: CatalogItems[0].title,
     description: '',
     state: 'New',
@@ -155,7 +158,7 @@ const RequestItems = [
   },
   {
     _id: new ObjectID(),
-    number: 'REQ0001002',
+    number: 'RITM0001002',
     short_description: CatalogItems[1].title,
     description: 'Testing description 00',
     state: 'New',
@@ -164,7 +167,7 @@ const RequestItems = [
   },
   {
     _id: new ObjectID(),
-    number: 'REQ0001003',
+    number: 'RITM0001003',
     short_description: CatalogItems[2].title,
     description: 'Testing more descriptions 00',
     state: 'New',

@@ -29,7 +29,7 @@ exports.create = (req, res) => {
 
 // GET    list all catalog items
 exports.list = (req, res) => {
-  CatalogItem.find({ type: 'item' })
+  CatalogItem.find({ type: 'cat_item' })
     .then(docs => {
       res.json(docs)
     })
@@ -38,14 +38,14 @@ exports.list = (req, res) => {
 
 // DELETE delete all catalog items
 exports.deleteAll = (req, res) => {
-  CatalogItem.remove({ type: 'item' })
+  CatalogItem.remove({ type: 'cat_item' })
     .then(docs => {
       res.status(204).json(docs)
     })
     .catch(e => res.status(400).send(apiErrorMsg('delete', 'catalog items', e)))
 }
 
-// GET    return a vehicle by id
+// GET    return a catalog item by id
 exports.findById = (req, res) => {
   const id = req.params.id
   if (!id) {
@@ -68,7 +68,7 @@ exports.findById = (req, res) => {
     )
 }
 
-// DELETE delete a vehicle by id
+// DELETE delete a catalog item by id
 exports.findByIdAndRemove = (req, res) => {
   const id = req.params.id
   if (!id) {

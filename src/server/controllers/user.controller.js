@@ -1,6 +1,7 @@
 const _ = require('lodash'),
   { Customer } = require('./../models/user.model'),
   { VehicleInstance } = require('./../models/vehicleInstance.model'),
+  { Request } = require('./../models/request'),
   { ObjectID } = require('mongodb')
 
 const apiErrorMsg = (verb, subject, error) => {
@@ -98,6 +99,37 @@ exports.findByIdAndRemove = (req, res) => {
     )
 }
 
+exports.findMe = (req, res) => {
+  if (!req.token) {
+    return res.status(400).send({ message: 'No token found in Request' })
+  }
+  Customer.findByToken(req.token)
+    .then(me => {
+      if (!me) {
+        return res
+          .status(400)
+          .send({ message: 'No user found by token provided' })
+      }
+
+      return res.json(me)
+    })
+    .catch(e => res.status(400).send(apiErrorMsg('get', 'customer', e)))
+}
+
+exports.findByUsername = (req, res) => {
+  if (!req.header('x-un')) {
+    return res.status(400).send({ message: 'No username found in Request' })
+  }
+  Customer.find({ username: req.header('x-un') })
+    .then(users => {
+      if (!users) {
+        return res.send('No user was found with this username.')
+      }
+      res.json(users[0])
+    })
+    .catch(e => res.status(400).send(apiErrorMsg('get', 'user by Email', e)))
+}
+
 // GET find a Customer's Vehicle Instances
 exports.findMyVehicles = (req, res) => {
   const owner = req.header('x-un')
@@ -114,19 +146,44 @@ exports.findMyVehicles = (req, res) => {
     )
 }
 
-exports.findMe = (req, res) => {
-  if (!req.token) {
-    return res.status(400).send({ message: 'No token found in Request' })
-  }
-  Customer.findByToken(req.token)
-    .then(me => {
-      if (!me) {
-        return res
-          .status(400)
-          .send({ message: 'No user found by token provided' })
-      }
+// GET find a Customer's Requests
+exports.findMyServices = (req, res) => {
+  const requester_id = req.header('x-un')
+  let myServices = {}
+  myServices.requests = []
+  myServices.request_items = []
+  let reqIds = []
 
-      return res.json(me)
+  Request.find({ requester_id })
+    .then(reqs => {
+      if (!reqs) {
+        throw new Error('Did not find any reqs for this user')
+      }
+      reqs.forEach(req => {
+        myServices.requests.push(req)
+        reqIds.push(req._id)
+      })
     })
-    .catch(e => res.status(400).send(apiErrorMsg('get', 'customer', e)))
+    .then(() => {
+      Request.find({ request_id: { $in: reqIds } })
+        .then(reqItems => {
+          if (!reqItems) {
+            throw new Error('Did not find any reqItems for this user')
+          }
+          reqItems.forEach(reqItem => {
+            myServices.request_items.push(reqItem)
+          })
+        })
+        .then(() => {
+          res.json(myServices)
+        })
+        .catch(e =>
+          res
+            .status(400)
+            .send(apiErrorMsg('get', 'request items by Customer', e))
+        )
+    })
+    .catch(e =>
+      res.status(400).send(apiErrorMsg('get', 'requests by Customer', e))
+    )
 }

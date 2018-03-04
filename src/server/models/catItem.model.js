@@ -24,7 +24,7 @@ const CatalogItemSchema = BaseSchema.extend(
     thumbnail: Buffer,
     type: {
       type: String,
-      default: 'item'
+      default: 'cat_item'
     },
     categories: [
       {

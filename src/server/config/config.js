@@ -1,5 +1,5 @@
-let env = process.env.NODE_ENV || 'development'
-// let env = 'development' // use this line instead when seeding db
+// let env = process.env.NODE_ENV || 'development'
+let env = 'development' // use this line instead when seeding db
 
 if (env === 'development') {
   process.env.PORT = 3000

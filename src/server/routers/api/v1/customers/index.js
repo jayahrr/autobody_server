@@ -22,12 +22,26 @@ router
   .all(authenticate)
   .get(CUSTOMERS.findMe)
 
+// /api/v1/customers/email
+router
+  .route('/email')
+
+  // .all(authenticate)
+  .get(CUSTOMERS.findByUsername)
+
 // /api/v1/customers/myVehicles
 router
   .route('/myVehicles')
 
   // .all( authenticate )
   .get(CUSTOMERS.findMyVehicles)
+
+// /api/v1/customers/myRequests
+router
+  .route('/myRequests')
+
+  // .all( authenticate )
+  .get(CUSTOMERS.findMyServices)
 
 // /api/v1/customers/:id
 router

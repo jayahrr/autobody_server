@@ -6,7 +6,7 @@ const express = require('express'),
 // ----------------------------------------------------
 const router = express.Router() // get an instance of the express Router
 
-// /api/v1/catalog_items
+// /api/v1/catalog
 router
   .route('/')
 
@@ -14,7 +14,13 @@ router
   .get(CATALOG.list)
   .delete(CATALOG.deleteAll)
 
-// /api/v1/catalog_items/:id
+// /api/v1/catalog/full
+router
+  .route('/full')
+
+  .get(CATALOG.full)
+
+// /api/v1/catalog/:id
 router
   .route('/:id')
 
