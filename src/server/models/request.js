@@ -26,6 +26,14 @@ const RequestSchema = BaseSchema.extend(
         request_item_id: { ref: 'Requests', type: Schema.ObjectId }
       }
     ],
+    service_date: {
+      type: String,
+      default: ''
+    },
+    service_location: {
+      type: String,
+      default: ''
+    },
     type: {
       type: String,
       default: 'request'

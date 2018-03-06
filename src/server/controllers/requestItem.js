@@ -8,19 +8,18 @@ const _ = require('lodash'),
 // POST   create a request item
 exports.create = (req, res) => {
   let body = _.pick(req.body, [
-    'number',
     'state',
     'short_description',
     'description',
     'priority',
     'request_id',
+    'requester_id',
     'requester_vehicle_id',
     'servicer_id',
-    'catalog_item_id'
+    'catalog_item_id',
+    'service_date',
+    'service_location'
   ])
-  if (!body.number) {
-    return res.status(400).send('Missing required parameter(s)')
-  }
 
   let newRequestItem = new RequestItem(body)
   newRequestItem

@@ -33,6 +33,10 @@ const RequestSchema = BaseSchema.extend(
       ref: 'Requests',
       type: Schema.ObjectId
     },
+    requester_id: {
+      ref: 'Users',
+      type: Schema.ObjectId
+    },
     requester_vehicle_id: {
       ref: 'VehicleInstances',
       type: Schema.ObjectId
@@ -44,6 +48,14 @@ const RequestSchema = BaseSchema.extend(
     catalog_item_id: {
       ref: 'Catalog',
       type: Schema.ObjectId
+    },
+    service_date: {
+      type: String,
+      default: ''
+    },
+    service_location: {
+      type: String,
+      default: ''
     },
     type: {
       type: String,
