@@ -43,6 +43,6 @@ const RequestSchema = BaseSchema.extend(
 )
 
 // Create the Service Request Model
-const Request = mongoose.model('request', RequestSchema)
+const Request = mongoose.model('Request', RequestSchema)
 
 module.exports = { Request }
