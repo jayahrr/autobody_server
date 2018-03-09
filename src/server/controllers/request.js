@@ -7,11 +7,17 @@ const _ = require('lodash'),
 
 // POST   create a request
 exports.create = (req, res) => {
-  let body = _.pick(req.body, ['number', 'state', 'requester_id'])
-  if (!body.number) {
-    return res.status(400).send('Missing required parameter(s)')
-  }
-
+  let body = _.pick(req.body, [
+    'service_date',
+    'service_location',
+    'short_description',
+    'requester_vehicle_id',
+    'requester_id'
+  ])
+  // if (!body.number) {
+  //   return res.status(400).send('Missing required parameter(s)')
+  // }
+  body.number = 'REQ001007'
   let newRequest = new Request(body)
   newRequest
     .save()

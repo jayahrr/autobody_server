@@ -41,6 +41,7 @@ router
   .route('/myRequests')
 
   // .all( authenticate )
+  .post(CUSTOMERS.createMyServiceRequest)
   .get(CUSTOMERS.findMyServices)
 
 // /api/v1/customers/:id

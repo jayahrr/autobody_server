@@ -187,3 +187,26 @@ exports.findMyServices = (req, res) => {
       res.status(400).send(apiErrorMsg('get', 'requests by Customer', e))
     )
 }
+
+// POST find a Customer's Requests
+exports.createMyServiceRequest = (req, res) => {
+  req.request = {}
+  req.request_items = []
+  // let reqIds = []
+
+  let body = _.pick(req.body, [
+    'service_date',
+    'service_location',
+    'short_description',
+    'requester_vehicle_id',
+    'requester_id'
+  ])
+  body.number = 'REQ001007'
+  let newRequest = new Request(body)
+  newRequest
+    .save()
+    .then(doc => {
+      res.status(201).json(doc)
+    })
+    .catch(e => res.status(400).send(apiErrorMsg('create', 'request', e)))
+}
