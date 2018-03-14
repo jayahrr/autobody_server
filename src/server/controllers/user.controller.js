@@ -190,16 +190,15 @@ exports.findMyServices = (req, res) => {
 
 // POST find a Customer's Requests
 exports.createMyServiceRequest = (req, res) => {
-  req.request = {}
-  req.request_items = []
-  // let reqIds = []
-
+  console.log(req.body)
   let body = _.pick(req.body, [
     'service_date',
     'service_location',
+    'description',
     'short_description',
     'requester_vehicle_id',
-    'requester_id'
+    'requester_id',
+    'request_items'
   ])
   body.number = 'REQ001007'
   let newRequest = new Request(body)

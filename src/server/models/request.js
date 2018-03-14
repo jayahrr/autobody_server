@@ -25,11 +25,7 @@ const RequestSchema = BaseSchema.extend(
       ref: 'VehicleInstances',
       type: Schema.ObjectId
     },
-    request_items: [
-      {
-        request_item_id: { ref: 'Requests', type: Schema.ObjectId }
-      }
-    ],
+    request_items: [{ type: String }],
     service_date: {
       type: String,
       default: ''
@@ -39,6 +35,10 @@ const RequestSchema = BaseSchema.extend(
       default: ''
     },
     short_description: {
+      type: String,
+      default: ''
+    },
+    description: {
       type: String,
       default: ''
     },
