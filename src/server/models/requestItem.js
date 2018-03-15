@@ -25,38 +25,38 @@ const RequestSchema = BaseSchema.extend(
       type: String,
       default: 'New'
     },
-    priority: {
-      type: String,
-      default: '4 - Low'
-    },
+    // priority: {
+    //   type: String,
+    //   default: '4 - Low'
+    // },
     request_id: {
       ref: 'Requests',
       type: Schema.ObjectId
     },
-    requester_id: {
-      ref: 'Users',
-      type: Schema.ObjectId
-    },
-    requester_vehicle_id: {
-      ref: 'VehicleInstances',
-      type: Schema.ObjectId
-    },
-    servicer_id: {
-      ref: 'Users',
-      type: Schema.ObjectId
-    },
+    // requester_id: {
+    //   ref: 'Users',
+    //   type: Schema.ObjectId
+    // },
+    // requester_vehicle_id: {
+    //   ref: 'VehicleInstances',
+    //   type: Schema.ObjectId
+    // },
+    // servicer_id: {
+    //   ref: 'Users',
+    //   type: Schema.ObjectId
+    // },
     catalog_item_id: {
       ref: 'Catalog',
       type: Schema.ObjectId
     },
-    service_date: {
-      type: String,
-      default: ''
-    },
-    service_location: {
-      type: String,
-      default: ''
-    },
+    // service_date: {
+    //   type: Date,
+    //   default: ''
+    // },
+    // service_location: {
+    //   type: String,
+    //   default: ''
+    // },
     type: {
       type: String,
       default: 'item'
