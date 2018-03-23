@@ -77,8 +77,9 @@ exports.findByIdAndRemove = (req, res) => {
     return res.status(400).send('Invalid ID')
   }
 
-  Request.findByIdAndRemove(id)
+  Request.findById(id)
     .then(doc => {
+      doc.remove()
       res.status(204).json(doc)
     })
     .catch(e => res.status(400).send(apiErrorMsg('delete', 'request by ID', e)))

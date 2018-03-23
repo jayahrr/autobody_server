@@ -197,9 +197,9 @@ exports.createMyServiceRequest = (req, res) => {
     'short_description',
     'requester_vehicle_id',
     'requester_id',
-    'request_items'
+    'cartItemIds'
   ])
-  body.number = 'REQ001009'
+  body.number = `REQ100${Math.floor(Math.random() * 10 + 1)}`
   let newRequest = new Request(body)
   newRequest
     .save()
