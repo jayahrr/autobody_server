@@ -1,4 +1,5 @@
 const { mongoose, Schema } = require('../db/mongoose')
+const ObjectId = require('mongodb').ObjectID
 const { BaseSchema } = require('./base')
 const { Vehicle } = require('./vehicle.model')
 const { Customer } = require('./user.model')
@@ -50,14 +51,14 @@ const VehicleInstanceSchema = BaseSchema.extend(
     },
     services: [
       {
-        type: Schema.ObjectId,
-        ref: 'VehicleInstances'
+        ref: 'Requests',
+        type: Schema.ObjectId
       }
     ],
     last_services: [
       {
-        type: Schema.ObjectId,
-        ref: 'VehicleInstances'
+        ref: 'Requests',
+        type: Schema.ObjectId
       }
     ]
   },
@@ -65,42 +66,45 @@ const VehicleInstanceSchema = BaseSchema.extend(
 )
 
 VehicleInstanceSchema.pre('save', function(next) {
+  let vehicle = this
+  if (vehicle.owner) vehicle.owner = ObjectId(vehicle.owner)
   if (!this.current_location && this.owner.primary_location) {
     this.current_location = this.owner.primary_location
   }
   next()
 })
 
-// VehicleInstanceSchema.pre('remove', function(next) {
-//   let vehicleInstance = this
-//   function findAMatchAndSplice(doc) {
-//     var instance
-//     for (instance = 0; instance < doc.vehicle_instances.length; instance++) {
-//       if (doc.vehicle_instances[instance] == vehicleInstance.id) {
-//         doc.vehicle_instances.splice(instance, 1)
-//         doc
-//           .save()
-//           .catch(e =>
-//             console.log('Something went wrong removing owner ids!', e)
-//           )
-//       }
-//     }
-//   }
+VehicleInstanceSchema.pre('remove', function(next) {
+  let vehicleInstance = this
 
-//   if (vehicleInstance.owner) {
-//     Customer.findByIdAndUpdate(vehicleInstance.owner).exec(function(err, doc) {
-//       findAMatchAndSplice(doc)
-//     })
-//   }
+  function findAMatchAndSplice(doc) {
+    var instance
+    for (instance = 0; instance < doc.vehicle_instances.length; instance++) {
+      if (doc.vehicle_instances[instance] == vehicleInstance.id) {
+        doc.vehicle_instances.splice(instance, 1)
+        doc
+          .save()
+          .catch(e =>
+            console.log('Something went wrong removing owner ids!', e)
+          )
+      }
+    }
+  }
 
-//   if (vehicleInstance.vehicle) {
-//     Vehicle.findByIdAndUpdate(vehicleInstance.vehicle).exec(function(err, doc) {
-//       findAMatchAndSplice(doc)
-//     })
-//   }
+  if (vehicleInstance.owner) {
+    Customer.findByIdAndUpdate(vehicleInstance.owner).exec(function(err, doc) {
+      findAMatchAndSplice(doc)
+    })
+  }
 
-//   next()
-// })
+  if (vehicleInstance.vehicle) {
+    Vehicle.findByIdAndUpdate(vehicleInstance.vehicle).exec(function(err, doc) {
+      findAMatchAndSplice(doc)
+    })
+  }
+
+  next()
+})
 
 // Create the Vehicle Instance Model
 const VehicleInstance = mongoose.model(
