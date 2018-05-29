@@ -26,11 +26,7 @@ const CatalogSchema = BaseSchema.extend(
       default: 'catalog'
     },
     thumbnail: Buffer,
-    child_categories: [
-      {
-        category_id: { ref: 'Catalog', type: Schema.ObjectId }
-      }
-    ]
+    categories: [{ ref: 'Catalog', type: Schema.ObjectId }]
   },
   { collection: 'Catalog' }
 )

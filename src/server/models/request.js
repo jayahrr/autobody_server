@@ -1,5 +1,6 @@
 const _ = require('lodash')
 const { mongoose, Schema } = require('../db/mongoose')
+const ObjectId = require('mongodb').ObjectID
 const { BaseSchema } = require('./base')
 const { RequestItem } = require('./requestItem')
 const { VehicleInstance } = require('./vehicleInstance.model')
@@ -58,37 +59,39 @@ const RequestSchema = BaseSchema.extend(
   { collection: 'Requests' }
 )
 
-RequestSchema.pre('save', function(next) {
+RequestSchema.post('save', function() {
   let request = this
+  // run this block on insert
+  if (!Number(request.__v)) {
+    if (request.requester_vehicle_id) {
+      VehicleInstance.findByIdAndUpdate(request.requester_vehicle_id).exec(
+        (err, doc) => {
+          doc.services.push(request._id)
+          doc.save().catch(e => {
+            throw new Error(
+              'Error saving request id to related Vehicle Instance.....',
+              e
+            )
+          })
+        }
+      )
+    }
 
-  if (request.requester_vehicle_id) {
-    VehicleInstance.findByIdAndUpdate(request.requester_vehicle_id).exec(
-      (err, doc) => {
-        doc.services.push(request._id)
-        doc.save().catch(e => {
-          throw new Error(
-            'Error saving request id to related Vehicle Instance.....',
-            e
-          )
-        })
-      }
-    )
-  }
+    const data = {}
+    data.number = 'RITM0002001'
+    data.request_id = request._id
+    data.requester_id = request.requester_id
+    data.requester_vehicle_id = request.requester_vehicle_id
 
-  const data = {}
-  data.number = 'RITM0002001'
-  data.request_id = request._id
-  data.requester_id = request.requester_id
-  data.requester_vehicle_id = request.requester_vehicle_id
-
-  request.cartItemIds.forEach((cartItemId, index, array) => {
-    data.catalog_item_id = cartItemId
-    let newRITM = new RequestItem(data)
-    newRITM.save().then(doc => {
-      request.reqItemIds.push(doc._id)
-      if (index + 1 === array.length) next()
+    request.cartItemIds.forEach(id => {
+      if (!ObjectId.isValid(id)) ObjectId(id)
+      data.catalog_item_id = id
+      let newRITM = new RequestItem(data)
+      newRITM.save().then(doc => {
+        request.reqItemIds.push(doc._id)
+      })
     })
-  })
+  }
 })
 
 RequestSchema.pre('remove', function(next) {

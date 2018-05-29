@@ -87,8 +87,41 @@ exports.full = (req, res) => {
   full_catalog_object.cat_items = []
 
   Catalog.find({ active: true })
-    .then(docs =>
-      docs.forEach(doc => {
+    .then(docs => {
+      full_catalog_object.catalog = docs.find(({ type }) => type === 'catalog')
+
+      if (full_catalog_object.catalog.categories) {
+        let categories = []
+        full_catalog_object.catalog.categories.forEach(catId => {
+          categories.push(
+            docs.find(({ _id }) => _id.toString() === catId.toString())
+          )
+        })
+        if (categories.length) {
+          categories.forEach(cat => {
+            console.log(cat.title)
+            console.log(cat.description)
+            console.log(cat.type)
+            console.log(cat.child_categories)
+            console.log(cat.categories)
+            console.log(cat.items)
+            console.log(cat.cat_items)
+            console.log(cat.toString())
+            let catItems = []
+            // cat.cat_items.forEach(itemId => {
+            //   catItems.push(
+            //     docs.find(({ _id }) => _id.toString() === itemId.toString())
+            //   )
+            // })
+            cat.items = catItems
+          })
+          full_catalog_object.catalog.categories = categories
+        }
+      }
+
+      // console.log(full_catalog_object.catalog)
+
+      return docs.forEach(doc => {
         switch (doc.type) {
         case 'catalog':
           full_catalog_object.catalog = doc
@@ -103,7 +136,7 @@ exports.full = (req, res) => {
           break
         }
       })
-    )
+    })
     .then(() => res.json(full_catalog_object))
     .catch(e => res.status(400).send(apiErrorMsg('get', 'full catalog', e)))
 }

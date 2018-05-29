@@ -23,9 +23,9 @@ const VehicleInstanceSchema = BaseSchema.extend(
       default: ''
     },
     owner: {
-      type: String,
-      required: true,
-      minlength: 1
+      ref: 'Users',
+      type: Schema.ObjectId,
+      required: true
     },
     year: {
       type: Number,
@@ -67,19 +67,43 @@ const VehicleInstanceSchema = BaseSchema.extend(
 
 VehicleInstanceSchema.pre('save', function(next) {
   let vehicle = this
-  if (vehicle.owner) vehicle.owner = ObjectId(vehicle.owner)
+  if (!ObjectId.isValid(vehicle.owner)) {
+    vehicle.owner = ObjectId(vehicle.owner)
+  }
+
   if (!this.current_location && this.owner.primary_location) {
     this.current_location = this.owner.primary_location
   }
   next()
 })
 
+VehicleInstanceSchema.post('save', function() {
+  let vehicle = this
+  if (!Number(vehicle.__v)) {
+    console.log('PASSED THE NUMBER IF')
+    console.log('POST', vehicle)
+    Customer.findByIdAndUpdate(vehicle.owner).exec(function(err, doc) {
+      if (err) console.log(err)
+      console.log(doc)
+      doc.vehicle_instances.push(vehicle.owner)
+      console.log('doc before save', doc)
+      doc
+        .save()
+        .catch(e =>
+          console.log(
+            'Something when wrong when updating vehicle instances\' related customer record',
+            e
+          )
+        )
+    })
+  }
+})
+
 VehicleInstanceSchema.pre('remove', function(next) {
   let vehicleInstance = this
 
   function findAMatchAndSplice(doc) {
-    var instance
-    for (instance = 0; instance < doc.vehicle_instances.length; instance++) {
+    doc.vehicle_instances.forEach(instance => {
       if (doc.vehicle_instances[instance] == vehicleInstance.id) {
         doc.vehicle_instances.splice(instance, 1)
         doc
@@ -88,7 +112,7 @@ VehicleInstanceSchema.pre('remove', function(next) {
             console.log('Something went wrong removing owner ids!', e)
           )
       }
-    }
+    })
   }
 
   if (vehicleInstance.owner) {

@@ -4,6 +4,7 @@ const app = require('./../server').app,
   { ObjectID } = require('mongodb'),
   { Customer } = require('./../models/user.model'),
   { Vehicle } = require('./../models/vehicle.model'),
+  { VehicleInstance } = require('./../models/vehicleInstance.model'),
   { Catalog } = require('./../models/catalog.model'),
   { CatalogCategory } = require('./../models/catCategory.model'),
   { CatalogItem } = require('./../models/catItem.model'),
@@ -56,18 +57,31 @@ const Vehicles = [
   },
   {
     _id: new ObjectID(),
-    manufacturer: 'BMW',
-    make: 'BMW',
-    model: 'M1',
-    year: '2015',
-    class: 'AMG'
+    manufacturer: 'Chevrolet',
+    make: 'Chevrolet',
+    model: 'Colorado',
+    year: '2016',
+    class: 'Z71'
+  }
+]
+
+const VehicleInstances = [
+  {
+    _id: new ObjectID(),
+    owner: Customers[0]._id,
+    name: 'ZoeyD',
+    vin: '1GCGSDE36G1106864',
+    year: Vehicles[2].year,
+    make: Vehicles[2].make,
+    model: Vehicles[2].model,
+    manufacturer: Vehicles[2].manufacturer,
+    current_location: '8414 Devenir Ave Downey, CA 90242'
   }
 ]
 
 const Catalogs = [
   {
     _id: new ObjectID(),
-    order: 0,
     title: 'AutoBuddy Catalog',
     description:
       'A service catalog containing all the services that AutoBuddy\'s can provide.'
@@ -104,21 +118,18 @@ const CatalogCategories = [
 const CatalogItems = [
   {
     _id: new ObjectID(),
-    order: 0,
     title: 'Oil change',
     description: 'Have the oil for your vehicle changed',
     categories: [CatalogCategories[0]._id]
   },
   {
     _id: new ObjectID(),
-    order: 0,
     title: 'Change a tire',
     description: 'Replace a tire on your vehicle',
     categories: [CatalogCategories[1]._id]
   },
   {
     _id: new ObjectID(),
-    order: 0,
     title: 'Fix broken door handle',
     description: 'Replace, fix, or remove your vehicle\'s door handle',
     categories: [CatalogCategories[2]._id]
@@ -130,19 +141,23 @@ const Requests = [
     _id: new ObjectID(),
     number: 'REQ0001001',
     state: 'New',
-    requester_id: Customers[0]._id
+    requester_id: Customers[0]._id,
+    requester_vehicle_id: VehicleInstances[0]._id,
+    cartItemIds: [CatalogItems[0]._id, CatalogItems[1]._id, CatalogItems[2]._id]
   },
   {
     _id: new ObjectID(),
     number: 'REQ0001002',
     state: 'New',
-    requester_id: Customers[0]._id
+    requester_id: Customers[0]._id,
+    requester_vehicle_id: VehicleInstances[0]._id
   },
   {
     _id: new ObjectID(),
     number: 'REQ0001003',
     state: 'New',
-    requester_id: Customers[1]._id
+    requester_id: Customers[1]._id,
+    requester_vehicle_id: VehicleInstances[0]._id
   }
 ]
 
@@ -185,25 +200,29 @@ before(done => {
     return Vehicle.insertMany(Vehicles)
   })
 
+  VehicleInstance.remove({}).then(() => {
+    return VehicleInstance.create(VehicleInstances)
+  })
+
   Catalog.remove({}).then(() => {
     return Catalog.insertMany(Catalogs)
   })
 
   CatalogCategory.remove({}).then(() => {
-    return CatalogCategory.insertMany(CatalogCategories)
+    return CatalogCategory.create(CatalogCategories)
   })
 
   CatalogItem.remove({}).then(() => {
-    return CatalogItem.insertMany(CatalogItems)
+    return CatalogItem.create(CatalogItems)
   })
 
   Request.remove({}).then(() => {
-    return Request.insertMany(Requests)
+    return Request.create(Requests)
   })
 
   RequestItem.remove({})
     .then(() => {
-      return RequestItem.insertMany(RequestItems)
+      return //RequestItem.insertMany(RequestItems)
     })
     .then(() => done())
 })
@@ -248,6 +267,21 @@ describe('SEEDING DATABASE', () => {
         if (res.body.length != 3) {
           throw new Error(
             `Vehicles found is ${res.body.length} instead of the expected 3.`
+          )
+        }
+      })
+      .expect(200, done)
+  })
+
+  it('should return 1 new vehicle instance record', done => {
+    request(app)
+      .get('/api/v1/vehicleInstances')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', 'application/json; charset=utf-8')
+      .expect(function(res) {
+        if (res.body.length != 1) {
+          throw new Error(
+            `Vehicle Instances found is ${res.body.length} instead of the expected 1.`
           )
         }
       })

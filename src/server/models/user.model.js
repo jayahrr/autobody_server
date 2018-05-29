@@ -90,21 +90,26 @@ const UserSchema = BaseSchema.extend(
 
 UserSchema.pre('save', function(next) {
   let user = this
-  user.username = user.email
-  user.first_name = _.capitalize(user.first_name)
-  user.last_name = _.capitalize(user.last_name)
-  user.name = `${user.first_name} ${user.last_name}`
 
-  if (user.isModified('password')) {
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(user.password, salt, (err, hash) => {
-        user.password = hash
-        next()
+  if (!Number(user.__v)) {
+    user.username = user.email
+    user.first_name = _.capitalize(user.first_name)
+    user.last_name = _.capitalize(user.last_name)
+    user.name = `${user.first_name} ${user.last_name}`
+
+    if (user.isModified('password')) {
+      bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(user.password, salt, (err, hash) => {
+          user.password = hash
+          next()
+        })
       })
-    })
-  } else {
-    next()
+    } else {
+      next()
+    }
   }
+
+  next()
 })
 
 UserSchema.methods.toJSON = function() {
