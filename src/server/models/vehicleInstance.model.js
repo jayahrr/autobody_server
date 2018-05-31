@@ -80,13 +80,8 @@ VehicleInstanceSchema.pre('save', function(next) {
 VehicleInstanceSchema.post('save', function() {
   let vehicle = this
   if (!Number(vehicle.__v)) {
-    console.log('PASSED THE NUMBER IF')
-    console.log('POST', vehicle)
     Customer.findByIdAndUpdate(vehicle.owner).exec(function(err, doc) {
-      if (err) console.log(err)
-      console.log(doc)
       doc.vehicle_instances.push(vehicle.owner)
-      console.log('doc before save', doc)
       doc
         .save()
         .catch(e =>
