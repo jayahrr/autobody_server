@@ -131,61 +131,63 @@ exports.findByUsername = (req, res) => {
 }
 
 // GET find a Customer's Vehicle Instances
-exports.findMyVehicles = (req, res) => {
+exports.findMyVehicles = async (req, res) => {
   const owner = req.header('x-un')
+  const vehicles = await VehicleInstance.find({ owner }).lean()
+  const docs = await Request.find({ requester_id: owner }).lean()
+  if (!vehicles.length) {
+    return res.send('You have no vehicles')
+  }
 
-  VehicleInstance.find({ owner })
-    .then(myVehicles => {
-      if (!myVehicles) {
-        return res.send('You have no vehicles')
-      }
-      res.json(myVehicles)
+  // for each vehicle
+  vehicles.forEach(vehicle => {
+    // generate the requests array
+    const requests = docs.filter(doc => {
+      if (doc.requester_vehicle_id !== undefined)
+        return doc.requester_vehicle_id.toString() === vehicle._id.toString()
+      return false
     })
-    .catch(e =>
-      res.status(400).send(apiErrorMsg('get', 'vehicleInstance by Customer', e))
-    )
+
+    if (!_.isEmpty(requests)) {
+      // for each request
+      requests.forEach(request => {
+        // generate a ritms array
+        const ritms = docs.filter(doc => {
+          if (doc.request_id !== undefined)
+            return doc.request_id.toString() === request._id.toString()
+          return false
+        })
+        if (!_.isEmpty(ritms)) request.request_items = ritms
+      })
+      // set  vehicle's services
+      vehicle.services = requests
+    }
+  })
+  return res.json(vehicles)
 }
 
 // GET find a Customer's Requests
-exports.findMyServices = (req, res) => {
+exports.findMyServices = async (req, res) => {
   const requester_id = req.header('x-un')
-  let myServices = {}
-  myServices.requests = []
-  myServices.request_items = []
-  let reqIds = []
+  const services = await Request.find({ requester_id }).lean()
+  if (!services) {
+    throw new Error('Did not find any services for this user')
+  }
 
-  Request.find({ requester_id })
-    .then(reqs => {
-      if (!reqs) {
-        throw new Error('Did not find any reqs for this user')
-      }
-      reqs.forEach(req => {
-        myServices.requests.push(req)
-        reqIds.push(req._id)
-      })
+  // generate requests and request items array
+  const requests = services.filter(svc => svc.type === 'request')
+  const ritms = services.filter(svc => svc.type === 'item')
+
+  // merge ritms into requests
+  if (requests.length && ritms.length) {
+    requests.forEach(request => {
+      request.request_items = ritms.filter(
+        ritm => ritm.request_id.toString() == request._id.toString()
+      )
     })
-    .then(() => {
-      Request.find({ request_id: { $in: reqIds } })
-        .then(reqItems => {
-          if (!reqItems) {
-            throw new Error('Did not find any reqItems for this user')
-          }
-          reqItems.forEach(reqItem => {
-            myServices.request_items.push(reqItem)
-          })
-        })
-        .then(() => {
-          res.json(myServices)
-        })
-        .catch(e =>
-          res
-            .status(400)
-            .send(apiErrorMsg('get', 'request items by Customer', e))
-        )
-    })
-    .catch(e =>
-      res.status(400).send(apiErrorMsg('get', 'requests by Customer', e))
-    )
+  }
+
+  return res.json({ requests })
 }
 
 // POST find a Customer's Requests

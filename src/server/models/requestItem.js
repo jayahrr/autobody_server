@@ -30,6 +30,10 @@ const RequestItemSchema = BaseSchema.extend(
       ref: 'Requests',
       type: Schema.ObjectId
     },
+    requester_id: {
+      ref: 'Customers',
+      type: Schema.ObjectId
+    },
     catalog_item_id: {
       ref: 'Catalog',
       type: Schema.ObjectId
