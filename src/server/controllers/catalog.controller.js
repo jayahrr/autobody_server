@@ -79,41 +79,41 @@ exports.findByIdAndRemove = (req, res) => {
 }
 
 // GET    list the entire catalog, including categories and items
-exports.full = (req, res) => {
+exports.full = async (req, res) => {
   // build the full catalog object
   const full_catalog_object = {}
   full_catalog_object.catalog = {}
 
-  Catalog.find({ active: true })
-    // return a plain JS Object instead of a Mongoose model object
-    .lean()
-    .then(docs => {
-      let catalog = docs.find(({ type }) => type === 'catalog')
+  // generate array of catalog related items
+  const docs = await Catalog.find({ active: true }).lean()
 
-      if (catalog.categories) {
-        let categories = []
-        catalog.categories.forEach(catId => {
-          categories.push(
-            docs.find(({ _id }) => _id.toString() === catId.toString())
+  // filter out the catalog
+  const catalog = docs.find(({ type }) => type === 'catalog')
+
+  if (catalog.categories.length) {
+    let categories = []
+    catalog.categories.forEach(catId => {
+      // generate the categories objects list
+      categories.push(
+        docs.find(({ _id }) => _id.toString() === catId.toString())
+      )
+    })
+    if (categories.length) {
+      categories.forEach(category => {
+        let catItems = []
+        category.cat_items.forEach(itemId => {
+          // generate the catalog items objects list
+          catItems.push(
+            docs.find(({ _id }) => _id.toString() === itemId.toString())
           )
         })
-        if (categories.length) {
-          categories.forEach(category => {
-            let catItems = []
-            category.cat_items.forEach(itemId => {
-              catItems.push(
-                docs.find(({ _id }) => _id.toString() === itemId.toString())
-              )
-            })
-            category.cat_items = catItems
-          })
-        }
-        catalog.categories = categories
-      }
+        category.cat_items = catItems
+      })
+    }
+    catalog.categories = categories
+  }
 
-      // console.log(full_catalog_object.catalog)
-      return (full_catalog_object.catalog = catalog)
-    })
-    .then(() => res.json(full_catalog_object))
-    .catch(e => res.status(400).send(apiErrorMsg('get', 'full catalog', e)))
+  full_catalog_object.catalog = catalog
+
+  return res.json(full_catalog_object)
 }
