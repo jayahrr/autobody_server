@@ -83,6 +83,8 @@ exports.full = async (req, res) => {
   // build the full catalog object
   const full_catalog_object = {}
   full_catalog_object.catalog = {}
+  full_catalog_object.categories = []
+  full_catalog_object.cat_items = []
 
   // generate array of catalog related items
   const docs = await Catalog.find({ active: true }).lean()
@@ -113,6 +115,10 @@ exports.full = async (req, res) => {
     catalog.categories = categories
   }
 
+  full_catalog_object.cat_items = docs.filter(({ type }) => type === 'cat_item')
+  full_catalog_object.categories = docs.filter(
+    ({ type }) => type === 'category'
+  )
   full_catalog_object.catalog = catalog
 
   return res.json(full_catalog_object)
