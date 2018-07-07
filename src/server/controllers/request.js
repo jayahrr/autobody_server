@@ -86,6 +86,7 @@ exports.findByIdAndRemove = (req, res) => {
 }
 
 exports.findNearbyRequestsByLocation = (req, res) => {
+  let requests = []
   let { lat, lon, rad } = req.params
   if (!lon || !lat || !rad) {
     return res.status(400).send('Missing required parameters')
@@ -108,6 +109,29 @@ exports.findNearbyRequestsByLocation = (req, res) => {
   }).then(docs => {
     if (!docs || !docs.length)
       return res.status(400).send('Unable to find Requests nearby.')
-    res.json(docs)
+    docs.forEach(doc => {
+      const {
+        state,
+        reqItemIds,
+        service_date,
+        service_location,
+        short_description,
+        number,
+        requester_id,
+        requester_vehicle_id
+      } = doc
+      const rq = {
+        state,
+        reqItemIds,
+        service_date,
+        service_location,
+        short_description,
+        number,
+        requester_id,
+        requester_vehicle_id
+      }
+      requests.push(rq)
+    })
+    res.json(requests)
   })
 }
