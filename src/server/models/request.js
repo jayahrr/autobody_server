@@ -36,8 +36,8 @@ const RequestSchema = BaseSchema.extend(
       default: ''
     },
     service_location: {
-      type: String,
-      default: ''
+      type: Object,
+      default: {}
     },
     servicer_id: {
       ref: 'Users',
@@ -58,6 +58,20 @@ const RequestSchema = BaseSchema.extend(
   },
   { collection: 'Requests' }
 )
+
+RequestSchema.pre('save', function(next) {
+  let request = this
+
+  if (
+    !Number(request.__v) &&
+    request.cartItemIds.length &&
+    !request.reqItemIds.length
+  ) {
+    request.reqItemIds = request.cartItemIds
+  }
+
+  next()
+})
 
 RequestSchema.post('save', function() {
   let request = this
@@ -94,6 +108,22 @@ RequestSchema.post('save', function() {
   }
 })
 
+RequestSchema.post('remove', function() {
+  console.log('POST REMOVE RAN!')
+  let request = this
+
+  if (!_.isEmpty(request.reqItemIds)) {
+    console.log('found some reqItemIds')
+    request.reqItemIds.forEach((reqItemId, index, array) => {
+      console.log('deleting .....', reqItemId)
+      console.log('valid id .....', ObjectId.isValid(reqItemId))
+      RequestItem.findById(reqItemId).exec(doc =>
+        console.log('doc is .....', doc)
+      )
+    })
+  }
+})
+
 RequestSchema.pre('remove', function(next) {
   let request = this
 
@@ -117,11 +147,22 @@ RequestSchema.pre('remove', function(next) {
   }
 
   if (!_.isEmpty(request.reqItemIds)) {
+    console.log('found some reqItemIds')
     request.reqItemIds.forEach((reqItemId, index, array) => {
-      RequestItem.findByIdAndRemove(reqItemId).then(() => {
-        if (index + 1 === array.length) next()
-      })
+      console.log('reqItemId .....', reqItemId)
+      console.log('valid id .....', ObjectId.isValid(reqItemId))
+      RequestItem.findOneAndRemove({ _id: reqItemId }).exec(doc =>
+        console.log('doc is .....', doc)
+      )
+      // RequestItem.findByIdAndRemove(reqItemId).then(doc => {
+      //   console.log('doc is .....', doc)
+      //   doc.remove()
+      //   if (index + 1 === array.length) next()
+      // })
     })
+    next()
+  } else {
+    next()
   }
 })
 

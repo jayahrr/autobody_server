@@ -14,6 +14,12 @@ router
   .get(REQUEST.list)
   .delete(REQUEST.deleteAll)
 
+// /api/v1/requests/nearby/:lat/:lon/:rad
+router
+  .route('/nearby/:lat/:lon/:rad')
+
+  .get(REQUEST.findNearbyRequestsByLocation)
+
 // /api/v1/requests/:id
 router
   .route('/:id')

@@ -143,53 +143,71 @@ const Requests = [
     state: 'New',
     requester_id: Customers[0]._id,
     requester_vehicle_id: VehicleInstances[0]._id,
-    cartItemIds: [CatalogItems[0]._id, CatalogItems[1]._id, CatalogItems[2]._id]
+    cartItemIds: [
+      CatalogItems[0]._id,
+      CatalogItems[1]._id,
+      CatalogItems[2]._id
+    ],
+    service_location: {
+      type: 'Point',
+      coordinates: [-122.03164178878069, 37.337030655817145] // longitude, latitude
+    }
   },
   {
     _id: new ObjectID(),
     number: 'REQ0001002',
     state: 'New',
     requester_id: Customers[0]._id,
-    requester_vehicle_id: VehicleInstances[0]._id
+    requester_vehicle_id: VehicleInstances[0]._id,
+    cartItemIds: [CatalogItems[1]._id, CatalogItems[2]._id],
+    service_location: {
+      type: 'Point',
+      coordinates: [-2.5469, 48.5917]
+    }
   },
   {
     _id: new ObjectID(),
     number: 'REQ0001003',
     state: 'New',
     requester_id: Customers[1]._id,
-    requester_vehicle_id: VehicleInstances[0]._id
+    requester_vehicle_id: VehicleInstances[0]._id,
+    cartItemIds: [CatalogItems[0]._id],
+    service_location: {
+      type: 'Point',
+      coordinates: [-122.0312186, 37.33233141]
+    }
   }
 ]
 
-const RequestItems = [
-  {
-    _id: new ObjectID(),
-    number: 'RITM0001001',
-    short_description: CatalogItems[0].title,
-    description: '',
-    state: 'New',
-    request_id: Requests[0]._id,
-    catalog_item_id: CatalogItems[0]._id
-  },
-  {
-    _id: new ObjectID(),
-    number: 'RITM0001002',
-    short_description: CatalogItems[1].title,
-    description: 'Testing description 00',
-    state: 'New',
-    request_id: Requests[1]._id,
-    catalog_item_id: CatalogItems[1]._id
-  },
-  {
-    _id: new ObjectID(),
-    number: 'RITM0001003',
-    short_description: CatalogItems[2].title,
-    description: 'Testing more descriptions 00',
-    state: 'New',
-    request_id: Requests[2]._id,
-    catalog_item_id: CatalogItems[2]._id
-  }
-]
+// const RequestItems = [
+//   {
+//     _id: new ObjectID(),
+//     number: 'RITM0001001',
+//     short_description: CatalogItems[0].title,
+//     description: '',
+//     state: 'New',
+//     request_id: Requests[0]._id,
+//     catalog_item_id: CatalogItems[0]._id
+//   },
+//   {
+//     _id: new ObjectID(),
+//     number: 'RITM0001002',
+//     short_description: CatalogItems[1].title,
+//     description: 'Testing description 00',
+//     state: 'New',
+//     request_id: Requests[1]._id,
+//     catalog_item_id: CatalogItems[1]._id
+//   },
+//   {
+//     _id: new ObjectID(),
+//     number: 'RITM0001003',
+//     short_description: CatalogItems[2].title,
+//     description: 'Testing more descriptions 00',
+//     state: 'New',
+//     request_id: Requests[2]._id,
+//     catalog_item_id: CatalogItems[2]._id
+//   }
+// ]
 
 before(done => {
   Customer.remove({}).then(() => {
@@ -281,7 +299,9 @@ describe('SEEDING DATABASE', () => {
       .expect(function(res) {
         if (res.body.length != 1) {
           throw new Error(
-            `Vehicle Instances found is ${res.body.length} instead of the expected 1.`
+            `Vehicle Instances found is ${
+              res.body.length
+            } instead of the expected 1.`
           )
         }
       })
@@ -352,13 +372,13 @@ describe('SEEDING DATABASE', () => {
       .expect(200, done)
   })
 
-  it('should return 3 new request item records', done => {
+  it('should return 6 new request item records', done => {
     request(app)
       .get('/api/v1/requestItems')
       .set('Accept', 'application/json')
       .expect('Content-Type', 'application/json; charset=utf-8')
       .expect(function(res) {
-        if (res.body.length != 3) {
+        if (res.body.length != 6) {
           throw new Error(
             `Request Items found is ${
               res.body.length

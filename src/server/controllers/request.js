@@ -77,10 +77,37 @@ exports.findByIdAndRemove = (req, res) => {
     return res.status(400).send('Invalid ID')
   }
 
-  Request.findById(id)
+  Request.findByIdAndRemove(id)
     .then(doc => {
       doc.remove()
       res.status(204).json(doc)
     })
     .catch(e => res.status(400).send(apiErrorMsg('delete', 'request by ID', e)))
+}
+
+exports.findNearbyRequestsByLocation = (req, res) => {
+  let { lat, lon, rad } = req.params
+  if (!lon || !lat || !rad) {
+    return res.status(400).send('Missing required parameters')
+  }
+
+  lat = Number(lat)
+  lon = Number(lon)
+  rad = Number(rad)
+
+  Request.find({
+    service_location: {
+      $near: {
+        $geometry: {
+          type: 'Point',
+          coordinates: [lon, lat]
+        },
+        $maxDistance: rad
+      }
+    }
+  }).then(docs => {
+    if (!docs || !docs.length)
+      return res.status(400).send('Unable to find Requests nearby.')
+    res.json(docs)
+  })
 }
