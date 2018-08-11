@@ -1,9 +1,9 @@
-const { mongoose, Schema } = require('../db/mongoose'),
-  { BaseSchema } = require('./base'),
-  validator = require('validator'),
-  _ = require('lodash'),
-  jwt = require('jsonwebtoken'),
-  bcrypt = require('bcryptjs')
+const { mongoose, Schema } = require('../db/mongoose')
+const { BaseSchema } = require('./base')
+const validator = require('validator')
+const _ = require('lodash')
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
 
 // Create the User Schemas
 const UserSchema = BaseSchema.extend(
@@ -12,29 +12,34 @@ const UserSchema = BaseSchema.extend(
       type: Boolean,
       default: true
     },
+
     username: {
       type: String,
       trim: true,
       unique: true,
       index: true
     },
+
     first_name: {
       type: String,
       required: [true, 'First name is required!'],
       minlength: 1,
       trim: true
     },
+
     last_name: {
       type: String,
       required: [true, 'Last name is required!'],
       minlength: 1,
       trim: true
     },
+
     name: {
       type: String,
       trim: true,
       default: ''
     },
+
     email: {
       type: String,
       required: [true, 'An email is required!'],
@@ -45,18 +50,23 @@ const UserSchema = BaseSchema.extend(
         message: '{VALUE} is not a valid email'
       }
     },
+
     phone: {
       type: String,
       trim: true,
       maxlength: [15, '{VALUE} is too long for a mobile phone number!']
     },
+
     primary_location: {
       type: String,
       trim: true,
       default: ''
     },
+
     type: String,
+
     rating: Number,
+
     reviews: [
       {
         review_id: {
@@ -65,11 +75,13 @@ const UserSchema = BaseSchema.extend(
         }
       }
     ],
+
     password: {
       type: String,
       required: [true, 'A password is required!'],
       minlength: 6
     },
+
     tokens: [
       {
         access: {
@@ -77,6 +89,7 @@ const UserSchema = BaseSchema.extend(
           required: true,
           trim: true
         },
+
         token: {
           type: String,
           required: true,
@@ -197,6 +210,7 @@ const CustomerSchema = UserSchema.extend(
       type: String,
       default: 'customer'
     },
+
     vehicle_instances: [
       {
         ref: 'vehicle_instance',
@@ -208,23 +222,26 @@ const CustomerSchema = UserSchema.extend(
 )
 
 // Create the Service Provider Schemas
-const ServiceProviderSchema = UserSchema.extend(
+const ServicerSchema = UserSchema.extend(
   {
     type: {
       type: String,
       default: 'Servicer'
     },
+
     company: {
       type: String,
       default: ''
     },
-    services: [
+
+    service_lines: [
       {
         ref: 'service',
         type: Schema.ObjectId
       }
     ],
-    service_instances: [
+
+    assigned_services: [
       {
         ref: 'service_instance',
         type: Schema.ObjectId
@@ -235,8 +252,8 @@ const ServiceProviderSchema = UserSchema.extend(
 )
 
 // Create the data models
-const User = mongoose.model('User', UserSchema),
-  Customer = mongoose.model('Customer', CustomerSchema),
-  ServiceProvider = mongoose.model('Servicer', ServiceProviderSchema)
+const User = mongoose.model('User', UserSchema)
+const Customer = mongoose.model('Customer', CustomerSchema)
+const Servicer = mongoose.model('Servicer', ServicerSchema)
 
-module.exports = { User, Customer, ServiceProvider }
+module.exports = { User, Customer, Servicer }

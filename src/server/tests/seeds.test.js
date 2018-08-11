@@ -151,7 +151,8 @@ const Requests = [
     service_location: {
       type: 'Point',
       coordinates: [-122.03164178878069, 37.337030655817145] // longitude, latitude
-    }
+    },
+    short_description: '3 items'
   },
   {
     _id: new ObjectID(),
@@ -163,7 +164,8 @@ const Requests = [
     service_location: {
       type: 'Point',
       coordinates: [-2.5469, 48.5917]
-    }
+    },
+    short_description: '2 items'
   },
   {
     _id: new ObjectID(),
@@ -175,7 +177,8 @@ const Requests = [
     service_location: {
       type: 'Point',
       coordinates: [-122.0312186, 37.33233141]
-    }
+    },
+    short_description: CatalogItems[0].title
   }
 ]
 

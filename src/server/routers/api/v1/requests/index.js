@@ -24,6 +24,7 @@ router
 router
   .route('/:id')
 
+  .post(REQUEST.findByIdAndUpdate)
   .get(REQUEST.findById)
   .delete(REQUEST.findByIdAndRemove)
 

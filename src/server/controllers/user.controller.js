@@ -39,7 +39,7 @@ exports.create = (req, res) => {
 
 // GET    list all customers
 exports.list = (req, res) => {
-  Customer.find()
+  Customer.find({ type: 'Customer' })
     .then(docs => {
       res.json(docs)
     })

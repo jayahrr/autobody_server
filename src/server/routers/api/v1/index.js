@@ -6,6 +6,7 @@ const express = require('express')
 const router = express.Router() // get an instance of the express Router
 
 router.use('/customers', require('./customers'))
+router.use('/servicers', require('./servicers'))
 router.use('/vehicles', require('./vehicles'))
 router.use('/vehicleInstances', require('./vehicleInstances'))
 router.use('/catalog_categories', require('./catalog_categories'))

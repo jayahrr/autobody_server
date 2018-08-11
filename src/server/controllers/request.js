@@ -59,7 +59,7 @@ exports.findById = (req, res) => {
   Request.findById(id)
     .then(doc => {
       if (!doc) {
-        return res.status(400).send('Unable to find Request by ID')
+        return res.status(400).send(apiErrorMsg('find', 'request by ID', ''))
       }
       res.json(doc)
     })
@@ -83,6 +83,31 @@ exports.findByIdAndRemove = (req, res) => {
       res.status(204).json(doc)
     })
     .catch(e => res.status(400).send(apiErrorMsg('delete', 'request by ID', e)))
+}
+
+// DELETE delete a request by id
+exports.findByIdAndUpdate = (req, res) => {
+  const id = req.params.id
+  console.log(JSON.stringify(req.body))
+  console.log(JSON.stringify(req.params))
+
+  if (!id) {
+    return res.status(400).send('Missing version or ID')
+  }
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(400).send('Invalid ID')
+  }
+
+  Request.findByIdAndUpdate(id, req.body, { new: true })
+    .then(doc => {
+      console.log(JSON.stringify(doc))
+      res.json(doc)
+    })
+    .catch(e => {
+      console.log(e)
+      return res.status(400).send(apiErrorMsg('update', 'request by ID', e))
+    })
 }
 
 exports.findNearbyRequestsByLocation = (req, res) => {
@@ -118,7 +143,8 @@ exports.findNearbyRequestsByLocation = (req, res) => {
         short_description,
         number,
         requester_id,
-        requester_vehicle_id
+        requester_vehicle_id,
+        _id
       } = doc
       const rq = {
         state,
@@ -128,7 +154,8 @@ exports.findNearbyRequestsByLocation = (req, res) => {
         short_description,
         number,
         requester_id,
-        requester_vehicle_id
+        requester_vehicle_id,
+        _id
       }
       requests.push(rq)
     })
