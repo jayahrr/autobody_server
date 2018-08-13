@@ -132,9 +132,20 @@ exports.findByUsername = (req, res) => {
 // GET find a Servicer's Work Requests
 exports.findMyWork = async (req, res) => {
   const servicer_id = req.header('x-un')
-  const services = await Request.find({ servicer_id }).lean()
-  if (!services) {
-    throw new Error('Did not find any services for this user')
+  let services = null
+
+  if (!servicer_id) {
+    return res.status(400).send('No ID specified')
+  }
+
+  if (!ObjectID.isValid(servicer_id)) {
+    return res.status(400).send('Invalid ID')
+  }
+
+  try {
+    services = await Request.find({ servicer_id }).lean()
+  } catch (error) {
+    throw new Error('Did not find any services for this user', error)
   }
 
   // generate requests and request items array

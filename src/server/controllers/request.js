@@ -122,6 +122,7 @@ exports.findNearbyRequestsByLocation = (req, res) => {
   rad = Number(rad)
 
   Request.find({
+    state: 'New',
     service_location: {
       $near: {
         $geometry: {

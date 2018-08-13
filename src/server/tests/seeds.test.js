@@ -3,6 +3,7 @@ const app = require('./../server').app,
   // assert  = require('assert'),
   { ObjectID } = require('mongodb'),
   { Customer } = require('./../models/user.model'),
+  { Servicer } = require('./../models/user.model'),
   { Vehicle } = require('./../models/vehicle.model'),
   { VehicleInstance } = require('./../models/vehicleInstance.model'),
   { Catalog } = require('./../models/catalog.model'),
@@ -182,6 +183,27 @@ const Requests = [
   }
 ]
 
+const Servicers = [
+  {
+    _id: new ObjectID(),
+    first_name: 'Jack',
+    last_name: 'Servicer',
+    email: 'servicer_1@example.com',
+    phone: '555-555-9999',
+    password: 'abc123',
+    service_lines: [CatalogItems[0]._id, CatalogItems[1]._id]
+  },
+  {
+    _id: new ObjectID(),
+    first_name: 'Jake',
+    last_name: 'Servicer',
+    email: 'servicer_2@example.com',
+    phone: '555-555-9999',
+    password: 'abc123',
+    service_lines: [CatalogItems[2]._id]
+  }
+]
+
 // const RequestItems = [
 //   {
 //     _id: new ObjectID(),
@@ -241,11 +263,18 @@ before(done => {
     return Request.create(Requests)
   })
 
-  RequestItem.remove({})
+  Servicer.remove({})
     .then(() => {
-      return //RequestItem.insertMany(RequestItems)
+      return Servicer.create(Servicers)
     })
+
     .then(() => done())
+
+  // RequestItem.remove({})
+  //   .then(() => {
+  //     return RequestItem.insertMany(RequestItems)
+  //   })
+  //   .then(() => done())
 })
 
 describe('SEEDING DATABASE', () => {
@@ -386,6 +415,21 @@ describe('SEEDING DATABASE', () => {
             `Request Items found is ${
               res.body.length
             } instead of the expected 3.`
+          )
+        }
+      })
+      .expect(200, done)
+  })
+
+  it('should return 2 new servicer records', done => {
+    request(app)
+      .get('/api/v1/servicers')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', 'application/json; charset=utf-8')
+      .expect(function(res) {
+        if (res.body.length != 2) {
+          throw new Error(
+            `Servicers found is ${res.body.length} instead of the expected 2.`
           )
         }
       })
