@@ -195,6 +195,7 @@ exports.createMyServiceRequest = (req, res) => {
   let body = _.pick(req.body, [
     'service_date',
     'service_location',
+    'service_location_address',
     'description',
     'short_description',
     'requester_vehicle_id',

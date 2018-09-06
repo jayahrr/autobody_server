@@ -153,7 +153,8 @@ const Requests = [
       type: 'Point',
       coordinates: [-122.03164178878069, 37.337030655817145] // longitude, latitude
     },
-    short_description: '3 items'
+    short_description: '3 items',
+    description: 'Car is pretty messed up.'
   },
   {
     _id: new ObjectID(),
@@ -166,7 +167,8 @@ const Requests = [
       type: 'Point',
       coordinates: [-2.5469, 48.5917]
     },
-    short_description: '2 items'
+    short_description: '2 items',
+    description: 'Just my typical changes needed.'
   },
   {
     _id: new ObjectID(),
@@ -179,7 +181,8 @@ const Requests = [
       type: 'Point',
       coordinates: [-122.0312186, 37.33233141]
     },
-    short_description: CatalogItems[0].title
+    short_description: CatalogItems[0].title,
+    description: 'Running low on that juice!'
   }
 ]
 
@@ -292,7 +295,6 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
-
   it('should return 3 new customer records', done => {
     request(app)
       .get('/api/v1/customers')
@@ -307,7 +309,6 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
-
   it('should return 3 new vehicle records', done => {
     request(app)
       .get('/api/v1/vehicles')
@@ -322,7 +323,6 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
-
   it('should return 1 new vehicle instance record', done => {
     request(app)
       .get('/api/v1/vehicleInstances')
@@ -339,7 +339,6 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
-
   it('should return 1 new catalog record', done => {
     request(app)
       .get('/api/v1/catalog')
@@ -354,7 +353,6 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
-
   it('should return 3 new catalog category records', done => {
     request(app)
       .get('/api/v1/catalog_categories')
@@ -371,7 +369,6 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
-
   it('should return 3 new catalog item records', done => {
     request(app)
       .get('/api/v1/catalog_items')
@@ -388,7 +385,6 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
-
   it('should return 3 new request records', done => {
     request(app)
       .get('/api/v1/requests')
@@ -403,24 +399,22 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
-
-  it('should return 6 new request item records', done => {
-    request(app)
-      .get('/api/v1/requestItems')
-      .set('Accept', 'application/json')
-      .expect('Content-Type', 'application/json; charset=utf-8')
-      .expect(function(res) {
-        if (res.body.length != 6) {
-          throw new Error(
-            `Request Items found is ${
-              res.body.length
-            } instead of the expected 3.`
-          )
-        }
-      })
-      .expect(200, done)
-  })
-
+  // it('should return 6 new request item records', done => {
+  //   request(app)
+  //     .get('/api/v1/requestItems')
+  //     .set('Accept', 'application/json')
+  //     .expect('Content-Type', 'application/json; charset=utf-8')
+  //     .expect(function(res) {
+  //       if (res.body.length != 6) {
+  //         throw new Error(
+  //           `Request Items found is ${
+  //             res.body.length
+  //           } instead of the expected 3.`
+  //         )
+  //       }
+  //     })
+  //     .expect(200, done)
+  // })
   it('should return 2 new servicer records', done => {
     request(app)
       .get('/api/v1/servicers')

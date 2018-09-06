@@ -10,6 +10,7 @@ exports.create = (req, res) => {
   let body = _.pick(req.body, [
     'service_date',
     'service_location',
+    'service_location_address',
     'short_description',
     'requester_vehicle_id',
     'requester_id'
@@ -141,7 +142,9 @@ exports.findNearbyRequestsByLocation = (req, res) => {
         reqItemIds,
         service_date,
         service_location,
+        service_location_address,
         short_description,
+        description,
         number,
         requester_id,
         requester_vehicle_id,
@@ -152,7 +155,9 @@ exports.findNearbyRequestsByLocation = (req, res) => {
         reqItemIds,
         service_date,
         service_location,
+        service_location_address,
         short_description,
+        description,
         number,
         requester_id,
         requester_vehicle_id,

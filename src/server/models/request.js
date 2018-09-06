@@ -8,53 +8,72 @@ const { VehicleInstance } = require('./vehicleInstance.model')
 // Create the Service Request Schema
 const RequestSchema = BaseSchema.extend(
   {
+    
     active: {
       type: Boolean,
       default: true
     },
+
     number: {
       type: String,
       required: true,
       minlength: 1
     },
+
     state: {
       type: String,
       default: 'New'
     },
+
     requester_id: {
       ref: 'Users',
       type: Schema.ObjectId
     },
+
     requester_vehicle_id: {
       ref: 'VehicleInstances',
       type: Schema.ObjectId
     },
+
     cartItemIds: [{ type: String }],
+
     reqItemIds: [{ ref: 'Requests', type: Schema.ObjectId }],
+
     service_date: {
       type: String,
       default: ''
     },
+
     service_location: {
       type: Object,
       default: {}
     },
+
+    service_location_address: {
+      type: String,
+      default: ''
+    },
+
     servicer_id: {
       ref: 'Users',
       type: Schema.ObjectId
     },
+
     short_description: {
       type: String,
       default: ''
     },
+
     description: {
       type: String,
       default: ''
     },
+
     type: {
       type: String,
       default: 'request'
     }
+    
   },
   { collection: 'Requests' }
 )
