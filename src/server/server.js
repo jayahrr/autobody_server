@@ -6,7 +6,7 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const path = require('path')
 const publicPath = path.join(__dirname, '../client')
-const { authenticate } = require('./middleware/authenticate')
+// const { authenticate } = require('./middleware/authenticate')
 const port = process.env.PORT
 const app = express()
 

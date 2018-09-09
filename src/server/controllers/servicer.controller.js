@@ -163,3 +163,53 @@ exports.findMyWork = async (req, res) => {
 
   return res.json({ requests })
 }
+
+exports.getMyLocation = async (req, res) => {
+  const servicer_id = req.header('x-un')
+  let location = null
+
+  if (!servicer_id) {
+    return res.status(400).send('No ID specified')
+  }
+
+  if (!ObjectID.isValid(servicer_id)) {
+    return res.status(400).send('Invalid ID')
+  }
+
+  try {
+    location = await Servicer.findById(servicer_id)
+  } catch (error) {
+    throw new Error('Error setting location of user.', error)
+  }
+
+  return res.json({ location })
+}
+
+exports.setMyLocation = async (req, res) => {
+  const servicer_id = req.header('x-un')
+  let location = null
+  let body = _.pick(req.body, ['current_location', 'current_address'])
+
+  if (!servicer_id) {
+    return res.status(400).send('No ID specified')
+  }
+
+  if (!ObjectID.isValid(servicer_id)) {
+    return res.status(400).send('Invalid ID')
+  }
+
+  try {
+    location = await Servicer.findByIdAndUpdate(
+      servicer_id,
+      {
+        current_location: body.current_location,
+        current_address: body.current_address
+      },
+      { new: true, select: 'current_location current_address' }
+    ).lean()
+  } catch (error) {
+    throw new Error('Error setting location of user.', error)
+  }
+
+  return res.json({ location })
+}

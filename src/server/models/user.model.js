@@ -58,8 +58,28 @@ const UserSchema = BaseSchema.extend(
     },
 
     primary_location: {
+      type: Object,
+      default: {
+        type: 'Point',
+        coordiantes: [0, 0]
+      }
+    },
+
+    primary_address: {
       type: String,
-      trim: true,
+      default: ''
+    },
+
+    current_location: {
+      type: Object,
+      default: {
+        type: 'Point',
+        coordiantes: [0, 0]
+      }
+    },
+
+    current_address: {
+      type: String,
       default: ''
     },
 
@@ -134,6 +154,9 @@ UserSchema.methods.toJSON = function() {
       'active',
       'name',
       'primary_location',
+      'primary_address',
+      'current_location',
+      'current_address',
       'email',
       'phone',
       'username'

@@ -133,38 +133,38 @@ exports.findNearbyRequestsByLocation = (req, res) => {
         $maxDistance: rad
       }
     }
-  }).then(docs => {
-    if (!docs || !docs.length)
-      return res.status(400).send('Unable to find Requests nearby.')
-    docs.forEach(doc => {
-      const {
-        state,
-        reqItemIds,
-        service_date,
-        service_location,
-        service_location_address,
-        short_description,
-        description,
-        number,
-        requester_id,
-        requester_vehicle_id,
-        _id
-      } = doc
-      const rq = {
-        state,
-        reqItemIds,
-        service_date,
-        service_location,
-        service_location_address,
-        short_description,
-        description,
-        number,
-        requester_id,
-        requester_vehicle_id,
-        _id
-      }
-      requests.push(rq)
-    })
-    res.json(requests)
   })
+    .then(docs => {
+      if (!docs || !docs.length) return null
+      docs.forEach(doc => {
+        const {
+          state,
+          reqItemIds,
+          service_date,
+          service_location,
+          service_location_address,
+          short_description,
+          description,
+          number,
+          requester_id,
+          requester_vehicle_id,
+          _id
+        } = doc
+        const rq = {
+          state,
+          reqItemIds,
+          service_date,
+          service_location,
+          service_location_address,
+          short_description,
+          description,
+          number,
+          requester_id,
+          requester_vehicle_id,
+          _id
+        }
+        requests.push(rq)
+      })
+    })
+    .then(() => res.json(requests))
 }

@@ -22,6 +22,14 @@ router
   .all(authenticate)
   .get(Servicer.findMe)
 
+// /api/v1/servicers/me
+router
+  .route('/me/location')
+
+  // .all(authenticate)
+  .get(Servicer.getMyLocation)
+  .post(Servicer.setMyLocation)
+
 // /api/v1/servicers/email
 router
   .route('/email')
