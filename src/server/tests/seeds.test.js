@@ -137,11 +137,38 @@ const CatalogItems = [
   }
 ]
 
+const Servicers = [
+  {
+    _id: new ObjectID(),
+    first_name: 'Jack',
+    last_name: 'Servicer',
+    email: 'servicer_1@example.com',
+    phone: '555-555-9999',
+    password: 'abc123',
+    service_lines: [CatalogItems[0]._id, CatalogItems[1]._id],
+    primary_address: '8414 Devenir Ave. Downey, CA 90242',
+    primary_location: {
+      type: 'Point',
+      coordinates: [33.916427, -118.147419]
+    }
+  },
+  {
+    _id: new ObjectID(),
+    first_name: 'Josh',
+    last_name: 'Servicer',
+    email: 'servicer_2@example.com',
+    phone: '555-555-9999',
+    password: 'abc123',
+    service_lines: [CatalogItems[2]._id]
+  }
+]
+
 const Requests = [
   {
     _id: new ObjectID(),
     number: 'REQ0001001',
     state: 'New',
+    servicer_id: Servicers[0]._id,
     requester_id: Customers[0]._id,
     requester_vehicle_id: VehicleInstances[0]._id,
     cartItemIds: [
@@ -160,6 +187,7 @@ const Requests = [
     _id: new ObjectID(),
     number: 'REQ0001002',
     state: 'New',
+    servicer_id: Servicers[0]._id,
     requester_id: Customers[0]._id,
     requester_vehicle_id: VehicleInstances[0]._id,
     cartItemIds: [CatalogItems[1]._id, CatalogItems[2]._id],
@@ -174,6 +202,7 @@ const Requests = [
     _id: new ObjectID(),
     number: 'REQ0001003',
     state: 'New',
+    servicer_id: Servicers[1]._id,
     requester_id: Customers[1]._id,
     requester_vehicle_id: VehicleInstances[0]._id,
     cartItemIds: [CatalogItems[0]._id],
@@ -183,27 +212,6 @@ const Requests = [
     },
     short_description: CatalogItems[0].title,
     description: 'Running low on that juice!'
-  }
-]
-
-const Servicers = [
-  {
-    _id: new ObjectID(),
-    first_name: 'Jack',
-    last_name: 'Servicer',
-    email: 'servicer_1@example.com',
-    phone: '555-555-9999',
-    password: 'abc123',
-    service_lines: [CatalogItems[0]._id, CatalogItems[1]._id]
-  },
-  {
-    _id: new ObjectID(),
-    first_name: 'Jake',
-    last_name: 'Servicer',
-    email: 'servicer_2@example.com',
-    phone: '555-555-9999',
-    password: 'abc123',
-    service_lines: [CatalogItems[2]._id]
   }
 ]
 
@@ -266,18 +274,17 @@ before(done => {
     return Request.create(Requests)
   })
 
-  Servicer.remove({})
-    .then(() => {
-      return Servicer.create(Servicers)
-    })
+  Servicer.remove({}).then(() => {
+    return Servicer.create(Servicers)
+  })
 
+  // .then(() => done())
+
+  RequestItem.remove({})
+    // .then(() => {
+    //   return RequestItem.insertMany(RequestItems)
+    // })
     .then(() => done())
-
-  // RequestItem.remove({})
-  //   .then(() => {
-  //     return RequestItem.insertMany(RequestItems)
-  //   })
-  //   .then(() => done())
 })
 
 describe('SEEDING DATABASE', () => {
@@ -399,22 +406,22 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
-  // it('should return 6 new request item records', done => {
-  //   request(app)
-  //     .get('/api/v1/requestItems')
-  //     .set('Accept', 'application/json')
-  //     .expect('Content-Type', 'application/json; charset=utf-8')
-  //     .expect(function(res) {
-  //       if (res.body.length != 6) {
-  //         throw new Error(
-  //           `Request Items found is ${
-  //             res.body.length
-  //           } instead of the expected 3.`
-  //         )
-  //       }
-  //     })
-  //     .expect(200, done)
-  // })
+  it('should return 6 new request item records', done => {
+    request(app)
+      .get('/api/v1/requestItems')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', 'application/json; charset=utf-8')
+      .expect(function(res) {
+        if (res.body.length != 6) {
+          throw new Error(
+            `Request Items found is ${
+              res.body.length
+            } instead of the expected 3.`
+          )
+        }
+      })
+      .expect(200, done)
+  })
   it('should return 2 new servicer records', done => {
     request(app)
       .get('/api/v1/servicers')

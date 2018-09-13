@@ -22,6 +22,7 @@ db.on('error', console.error.bind(console, 'Connection Error:'))
 db.once('open', () => {
   if (process.env.NODE_ENV !== 'test') {
     const requestsCollection = db.collection('Requests')
+    requestsCollection.createIndex({ service_location: '2dsphere' })
     const changeStream = requestsCollection.watch()
 
     changeStream.on('change', change => {

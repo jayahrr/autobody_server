@@ -8,7 +8,6 @@ const { VehicleInstance } = require('./vehicleInstance.model')
 // Create the Service Request Schema
 const RequestSchema = BaseSchema.extend(
   {
-    
     active: {
       type: Boolean,
       default: true
@@ -73,7 +72,6 @@ const RequestSchema = BaseSchema.extend(
       type: String,
       default: 'request'
     }
-    
   },
   { collection: 'Requests' }
 )
@@ -81,21 +79,8 @@ const RequestSchema = BaseSchema.extend(
 RequestSchema.pre('save', function(next) {
   let request = this
 
-  if (
-    !Number(request.__v) &&
-    request.cartItemIds.length &&
-    !request.reqItemIds.length
-  ) {
-    request.reqItemIds = request.cartItemIds
-  }
-
-  next()
-})
-
-RequestSchema.post('save', function() {
-  let request = this
   // run this block on insert
-  if (!Number(request.__v)) {
+  if (request.__v === undefined || Number(request.__v) === 0) {
     if (request.requester_vehicle_id) {
       VehicleInstance.findByIdAndUpdate(request.requester_vehicle_id).exec(
         (err, doc) => {
@@ -110,18 +95,24 @@ RequestSchema.post('save', function() {
       )
     }
 
-    const data = {}
-    data.number = 'RITM0002001'
-    data.request_id = request._id
-    data.requester_id = request.requester_id
-    data.requester_vehicle_id = request.requester_vehicle_id
+    const ritm = {
+      number: 'RITM0002001',
+      request_id: request._id,
+      requester_id: request.requester_id,
+      requester_vehicle_id: request.requester_vehicle_id,
+      servicer_id: request.servicer_id
+    }
 
     request.cartItemIds.forEach(id => {
       if (!ObjectId.isValid(id)) ObjectId(id)
-      data.catalog_item_id = id
-      let newRITM = new RequestItem(data)
-      newRITM.save().then(doc => {
+      ritm.catalog_item_id = id
+      ritm.servicer_id = request.servicer_id
+      let newRITM = new RequestItem(ritm)
+      return newRITM.save().then(doc => {
         request.reqItemIds.push(doc._id)
+        if (request.reqItemIds.length === request.cartItemIds.length) {
+          next()
+        }
       })
     })
   }

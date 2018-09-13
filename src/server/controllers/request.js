@@ -1,9 +1,12 @@
-const _ = require('lodash'),
-  { Request } = require('./../models/request'),
-  { ObjectID } = require('mongodb'),
-  apiErrorMsg = (verb, subject, error) => {
-    return { message: `Unable to ${verb} the ${subject}`, error }
-  }
+const _ = require('lodash')
+const { Customer } = require('./../models/user.model')
+const { Request } = require('./../models/request')
+const { RequestItem } = require('./../models/requestItem')
+const { ObjectID } = require('mongodb')
+
+const apiErrorMsg = (verb, subject, error) => {
+  return { message: `Unable to ${verb} the ${subject}`, error }
+}
 
 // POST   create a request
 exports.create = (req, res) => {
@@ -111,7 +114,7 @@ exports.findByIdAndUpdate = (req, res) => {
     })
 }
 
-exports.findNearbyRequestsByLocation = (req, res) => {
+exports.findNearbyRequestsByLocation = async (req, res) => {
   let requests = []
   let { lat, lon, rad } = req.params
   if (!lon || !lat || !rad) {
@@ -122,49 +125,38 @@ exports.findNearbyRequestsByLocation = (req, res) => {
   lon = Number(lon)
   rad = Number(rad)
 
-  Request.find({
-    state: 'New',
-    service_location: {
-      $near: {
-        $geometry: {
-          type: 'Point',
-          coordinates: [lon, lat]
-        },
-        $maxDistance: rad
+  try {
+    const results = await Request.find({
+      state: 'New',
+      service_location: {
+        $near: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [lon, lat]
+          },
+          $maxDistance: rad
+        }
+      }
+    }).lean()
+    if (!results || !results.length) return null
+
+    // merge ritms into requests array
+    if (results.length) {
+      for (let index = 0; index < results.length; index++) {
+        const request = results[index]
+        if (request.reqItemIds.length !== 0) {
+          request.request_items = await RequestItem.find({
+            request_id: request._id
+          })
+        }
+        if (request.requester_id) {
+          request.requester = await Customer.findById(request.requester_id)
+        }
+        requests.push(request)
       }
     }
-  })
-    .then(docs => {
-      if (!docs || !docs.length) return null
-      docs.forEach(doc => {
-        const {
-          state,
-          reqItemIds,
-          service_date,
-          service_location,
-          service_location_address,
-          short_description,
-          description,
-          number,
-          requester_id,
-          requester_vehicle_id,
-          _id
-        } = doc
-        const rq = {
-          state,
-          reqItemIds,
-          service_date,
-          service_location,
-          service_location_address,
-          short_description,
-          description,
-          number,
-          requester_id,
-          requester_vehicle_id,
-          _id
-        }
-        requests.push(rq)
-      })
-    })
-    .then(() => res.json(requests))
+  } catch (error) {
+    throw new Error(error)
+  }
+  return res.json(requests)
 }

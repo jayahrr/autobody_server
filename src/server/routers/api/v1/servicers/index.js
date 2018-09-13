@@ -19,10 +19,11 @@ router
 router
   .route('/me')
 
-  .all(authenticate)
+  // .all(authenticate)
   .get(Servicer.findMe)
+  .post(Servicer.updateMe)
 
-// /api/v1/servicers/me
+// /api/v1/servicers/me/location
 router
   .route('/me/location')
 

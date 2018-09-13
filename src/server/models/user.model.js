@@ -159,7 +159,8 @@ UserSchema.methods.toJSON = function() {
       'current_address',
       'email',
       'phone',
-      'username'
+      'username',
+      'service_lines'
     ]
 
   return _.pick(userObject, userPublic)

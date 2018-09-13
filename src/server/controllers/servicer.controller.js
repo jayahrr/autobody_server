@@ -1,6 +1,8 @@
 const _ = require('lodash')
-const { Servicer } = require('./../models/user.model')
+const { Servicer, Customer } = require('./../models/user.model')
 const { Request } = require('./../models/request')
+const { RequestItem } = require('./../models/requestItem')
+const { CatalogItem } = require('./../models/catItem.model')
 const { ObjectID } = require('mongodb')
 
 const apiErrorMsg = (verb, subject, error) => {
@@ -102,6 +104,7 @@ exports.findMe = (req, res) => {
   if (!req.token) {
     return res.status(400).send({ message: 'No token found in Request' })
   }
+
   Servicer.findByToken(req.token)
     .then(me => {
       if (!me) {
@@ -115,23 +118,67 @@ exports.findMe = (req, res) => {
     .catch(e => res.status(400).send(apiErrorMsg('get', 'servicer', e)))
 }
 
-exports.findByUsername = (req, res) => {
+exports.updateMe = async (req, res) => {
+  const userID = req.header('x-un')
+  if (!userID) {
+    return res.status(400).send({ message: 'No username found in Request' })
+  }
+
+  let user
+  console.log('req.body: ', req.body)
+  try {
+    user = await Servicer.findByIdAndUpdate(userID, req.body.update, {
+      new: true
+    }).lean()
+  } catch (error) {
+    res.json({ error })
+    throw new Error(error)
+  }
+
+  return res.json(user)
+}
+
+exports.findByUsername = async (req, res) => {
   if (!req.header('x-un')) {
     return res.status(400).send({ message: 'No username found in Request' })
   }
-  Servicer.find({ username: req.header('x-un') })
-    .then(users => {
-      if (!users) {
-        return res.send('No user was found with this username.')
+
+  let user
+  let catItems = []
+  let serviceLines = []
+
+  try {
+    user = await Servicer.find({ username: req.header('x-un') }).lean()
+    user = user[0]
+    catItems = await CatalogItem.find({ type: 'cat_item' }).lean()
+    serviceLines = []
+  } catch (error) {
+    res.json({ error })
+    throw new Error(error)
+  }
+
+  if (user.service_lines.length !== 0) {
+    user.service_lines.forEach(lineID => {
+      const catItem = catItems.find(
+        item => item._id.toString() === lineID.toString()
+      )
+      if (catItem) {
+        serviceLines.push(catItem)
       }
-      res.json(users[0])
     })
-    .catch(e => res.status(400).send(apiErrorMsg('get', 'user by Email', e)))
+
+    user.service_lines =
+      serviceLines.length !== 0 ? serviceLines : user.service_lines
+  }
+
+  return res.json(user)
 }
 
 // GET find a Servicer's Work Requests
 exports.findMyWork = async (req, res) => {
   const servicer_id = req.header('x-un')
+  let requests = []
+  let ritms = []
   let services = null
 
   if (!servicer_id) {
@@ -143,25 +190,28 @@ exports.findMyWork = async (req, res) => {
   }
 
   try {
-    services = await Request.find({ servicer_id }).lean()
+    // generate requests
+    requests = await Request.find({ servicer_id }).lean()
   } catch (error) {
     throw new Error('Did not find any services for this user', error)
   }
 
-  // generate requests and request items array
-  const requests = services.filter(svc => svc.type === 'request')
-  const ritms = services.filter(svc => svc.type === 'item')
-
   // merge ritms into requests array
-  if (requests.length && ritms.length) {
-    requests.forEach(request => {
-      request.request_items = ritms.filter(
-        ritm => ritm.request_id.toString() == request._id.toString()
-      )
-    })
+  if (requests.length) {
+    for (let index = 0; index < requests.length; index++) {
+      const request = requests[index]
+      if (request.reqItemIds.length !== 0) {
+        request.request_items = await RequestItem.find({
+          request_id: request._id
+        })
+      }
+      if (request.requester_id) {
+        request.requester = await Customer.findById(request.requester_id)
+      }
+    }
   }
 
-  return res.json({ requests })
+  return res.json(requests)
 }
 
 exports.getMyLocation = async (req, res) => {
@@ -187,6 +237,7 @@ exports.getMyLocation = async (req, res) => {
 
 exports.setMyLocation = async (req, res) => {
   const servicer_id = req.header('x-un')
+  console.log('servicer_id: ', servicer_id)
   let location = null
   let body = _.pick(req.body, ['current_location', 'current_address'])
 
@@ -207,6 +258,7 @@ exports.setMyLocation = async (req, res) => {
       },
       { new: true, select: 'current_location current_address' }
     ).lean()
+    console.log('location: ', location)
   } catch (error) {
     throw new Error('Error setting location of user.', error)
   }
