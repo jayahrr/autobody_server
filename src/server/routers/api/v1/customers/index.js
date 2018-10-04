@@ -19,8 +19,9 @@ router
 router
   .route('/me')
 
-  .all(authenticate)
-  .get(CUSTOMERS.findMe)
+  // .all(authenticate)
+  // .get(CUSTOMERS.findMe)
+  .get(CUSTOMERS.findByUsername)
 
 // /api/v1/customers/email
 router

@@ -157,7 +157,7 @@ exports.findByUsername = async (req, res) => {
     throw new Error(error)
   }
 
-  if (user.service_lines.length !== 0) {
+  if (user.service_lines && user.service_lines.length !== 0) {
     user.service_lines.forEach(lineID => {
       const catItem = catItems.find(
         item => item._id.toString() === lineID.toString()
@@ -166,10 +166,9 @@ exports.findByUsername = async (req, res) => {
         serviceLines.push(catItem)
       }
     })
-
-    user.service_lines =
-      serviceLines.length !== 0 ? serviceLines : user.service_lines
   }
+
+  user.service_lines = serviceLines
 
   return res.json(user)
 }
@@ -177,38 +176,38 @@ exports.findByUsername = async (req, res) => {
 // GET find a Servicer's Work Requests
 exports.findMyWork = async (req, res) => {
   const servicer_id = req.header('x-un')
+  console.log('servicer_id: ', servicer_id)
   let requests = []
-  let ritms = []
-  let services = null
 
   if (!servicer_id) {
-    return res.status(400).send('No ID specified')
+    return res.status(400).send('No Servicer ID specified')
   }
 
   if (!ObjectID.isValid(servicer_id)) {
-    return res.status(400).send('Invalid ID')
+    return res.status(400).send('Invalid Servicer ID')
   }
 
   try {
     // generate requests
-    requests = await Request.find({ servicer_id }).lean()
-  } catch (error) {
-    throw new Error('Did not find any services for this user', error)
-  }
+    requests = await Request.find({ servicer_id, active: true }).lean()
 
-  // merge ritms into requests array
-  if (requests.length) {
-    for (let index = 0; index < requests.length; index++) {
-      const request = requests[index]
-      if (request.reqItemIds.length !== 0) {
-        request.request_items = await RequestItem.find({
-          request_id: request._id
-        })
-      }
-      if (request.requester_id) {
-        request.requester = await Customer.findById(request.requester_id)
+    // merge ritms into requests array
+    if (requests.length) {
+      for (let index = 0; index < requests.length; index++) {
+        const request = requests[index]
+        if (request.reqItemIds.length !== 0) {
+          request.request_items = await RequestItem.find({
+            request_id: request._id,
+            active: true
+          })
+        }
+        if (request.requester_id) {
+          request.requester = await Customer.findById(request.requester_id)
+        }
       }
     }
+  } catch (error) {
+    throw new Error('Did not find any services for this user', error)
   }
 
   return res.json(requests)
@@ -258,7 +257,6 @@ exports.setMyLocation = async (req, res) => {
       },
       { new: true, select: 'current_location current_address' }
     ).lean()
-    console.log('location: ', location)
   } catch (error) {
     throw new Error('Error setting location of user.', error)
   }

@@ -1,9 +1,10 @@
-const _ = require('lodash'),
-  { CatalogItem } = require('./../models/catItem.model'),
-  { ObjectID } = require('mongodb'),
-  apiErrorMsg = (verb, subject, error) => {
-    return { message: `Unable to ${verb} the ${subject}`, error }
-  }
+const _ = require('lodash')
+const { CatalogItem } = require('./../models/catItem.model')
+const { ObjectID } = require('mongodb')
+
+const apiErrorMsg = (verb, subject, error) => {
+  return { message: `Unable to ${verb} the ${subject}`, error }
+}
 
 // POST   create a catalog item
 exports.create = (req, res) => {

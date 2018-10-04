@@ -116,18 +116,42 @@ exports.findMe = (req, res) => {
     .catch(e => res.status(400).send(apiErrorMsg('get', 'customer', e)))
 }
 
-exports.findByUsername = (req, res) => {
+// exports.findByUsername = (req, res) => {
+//   if (!req.header('x-un')) {
+//     return res.status(400).send({ message: 'No username found in Request' })
+//   }
+//   Customer.find({ username: req.header('x-un') })
+//     .then(users => {
+//       if (!users) {
+//         return res.send('No user was found with this username.')
+//       }
+//       res.json(users[0])
+//     })
+//     .catch(e => res.status(400).send(apiErrorMsg('get', 'user by Email', e)))
+// }
+
+exports.findByUsername = async (req, res) => {
   if (!req.header('x-un')) {
     return res.status(400).send({ message: 'No username found in Request' })
   }
-  Customer.find({ username: req.header('x-un') })
-    .then(users => {
-      if (!users) {
-        return res.send('No user was found with this username.')
-      }
-      res.json(users[0])
-    })
-    .catch(e => res.status(400).send(apiErrorMsg('get', 'user by Email', e)))
+
+  let user
+  let vehicles = []
+  let serviceLines = []
+
+  try {
+    user = await Customer.find({ username: req.header('x-un') }).lean()
+    user = user[0]
+    if (user) {
+      vehicles = await VehicleInstance.find({ owner: user._id }).lean()
+      user.vehicle_instances = vehicles
+    }
+  } catch (error) {
+    res.json({ error })
+    throw new Error(error)
+  }
+
+  return res.json(user)
 }
 
 // GET find a Customer's Vehicle Instances

@@ -46,7 +46,8 @@ const Vehicles = [
     make: 'Honda',
     model: 'Civic',
     year: '1999',
-    class: 'EX'
+    class: 'EX',
+    title: '1999 Honda Civic Ex'
   },
   {
     _id: new ObjectID(),
@@ -54,7 +55,8 @@ const Vehicles = [
     make: 'Toyota',
     model: 'Camry',
     year: '2016',
-    class: 'Sport'
+    class: 'Sport',
+    title: '2016 Toyota Camry Sport'
   },
   {
     _id: new ObjectID(),
@@ -62,7 +64,8 @@ const Vehicles = [
     make: 'Chevrolet',
     model: 'Colorado',
     year: '2016',
-    class: 'Z71'
+    class: 'Z71',
+    title: '2016 Chevrolet Colorado Z71'
   }
 ]
 
@@ -76,6 +79,7 @@ const VehicleInstances = [
     make: Vehicles[2].make,
     model: Vehicles[2].model,
     manufacturer: Vehicles[2].manufacturer,
+    title: Vehicles[2].titlem,
     current_location: '8414 Devenir Ave Downey, CA 90242'
   }
 ]
@@ -113,6 +117,14 @@ const CatalogCategories = [
     description:
       'Services related to the improvement or maintenance of the vehicle\'s body parts',
     catalog: Catalogs[0]._id
+  },
+  {
+    _id: new ObjectID(),
+    order: 3,
+    title: 'Batteries & Electrical',
+    description:
+      'Services related to the replacement of the vehicle\'s batteries or installment of electric wiring.',
+    catalog: Catalogs[0]._id
   }
 ]
 
@@ -121,19 +133,43 @@ const CatalogItems = [
     _id: new ObjectID(),
     title: 'Oil change',
     description: 'Have the oil for your vehicle changed',
-    categories: [CatalogCategories[0]._id]
+    categories: [CatalogCategories[0]._id],
+    price: 4500,
+    duration: 2700000
   },
   {
     _id: new ObjectID(),
     title: 'Change a tire',
     description: 'Replace a tire on your vehicle',
-    categories: [CatalogCategories[1]._id]
+    categories: [CatalogCategories[1]._id],
+    price: 5000,
+    duration: 3600000
   },
   {
     _id: new ObjectID(),
     title: 'Fix broken door handle',
     description: 'Replace, fix, or remove your vehicle\'s door handle',
-    categories: [CatalogCategories[2]._id]
+    categories: [CatalogCategories[2]._id],
+    price: 5500,
+    duration: 3600000
+  },
+  {
+    _id: new ObjectID(),
+    title: 'Battery Replacement',
+    description:
+      'Replace your car\'s battery.' +
+      'Price includes cost of the new battery and disposal of the old one.',
+    categories: [CatalogCategories[3]._id],
+    price: 5000,
+    duration: 1800000
+  },
+  {
+    _id: new ObjectID(),
+    title: 'Battery Disposal',
+    description: 'Request disposal of an old car battery.',
+    categories: [CatalogCategories[3]._id],
+    price: 2000,
+    duration: 900000
   }
 ]
 
@@ -167,7 +203,7 @@ const Requests = [
   {
     _id: new ObjectID(),
     number: 'REQ0001001',
-    state: 'New',
+    state: 'Assigned',
     servicer_id: Servicers[0]._id,
     requester_id: Customers[0]._id,
     requester_vehicle_id: VehicleInstances[0]._id,
@@ -180,13 +216,14 @@ const Requests = [
       type: 'Point',
       coordinates: [-122.03164178878069, 37.337030655817145] // longitude, latitude
     },
+    service_date: '2018-09-13T12:30:00.011Z',
     short_description: '3 items',
     description: 'Car is pretty messed up.'
   },
   {
     _id: new ObjectID(),
     number: 'REQ0001002',
-    state: 'New',
+    state: 'Assigned',
     servicer_id: Servicers[0]._id,
     requester_id: Customers[0]._id,
     requester_vehicle_id: VehicleInstances[0]._id,
@@ -195,6 +232,7 @@ const Requests = [
       type: 'Point',
       coordinates: [-2.5469, 48.5917]
     },
+    service_date: '2018-09-30T12:30:00.011Z',
     short_description: '2 items',
     description: 'Just my typical changes needed.'
   },
@@ -202,7 +240,6 @@ const Requests = [
     _id: new ObjectID(),
     number: 'REQ0001003',
     state: 'New',
-    servicer_id: Servicers[1]._id,
     requester_id: Customers[1]._id,
     requester_vehicle_id: VehicleInstances[0]._id,
     cartItemIds: [CatalogItems[0]._id],
@@ -210,6 +247,7 @@ const Requests = [
       type: 'Point',
       coordinates: [-122.0312186, 37.33233141]
     },
+    service_date: '2018-09-28T12:30:00.011Z',
     short_description: CatalogItems[0].title,
     description: 'Running low on that juice!'
   }
@@ -360,33 +398,33 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
-  it('should return 3 new catalog category records', done => {
+  it('should return 4 new catalog category records', done => {
     request(app)
       .get('/api/v1/catalog_categories')
       .set('Accept', 'application/json')
       .expect('Content-Type', 'application/json; charset=utf-8')
       .expect(function(res) {
-        if (res.body.length != 3) {
+        if (res.body.length != 4) {
           throw new Error(
             `Catalog Categories found is ${
               res.body.length
-            } instead of the expected 3.`
+            } instead of the expected 4.`
           )
         }
       })
       .expect(200, done)
   })
-  it('should return 3 new catalog item records', done => {
+  it('should return 5 new catalog item records', done => {
     request(app)
       .get('/api/v1/catalog_items')
       .set('Accept', 'application/json')
       .expect('Content-Type', 'application/json; charset=utf-8')
       .expect(function(res) {
-        if (res.body.length != 3) {
+        if (res.body.length != 5) {
           throw new Error(
             `Catalog Items found is ${
               res.body.length
-            } instead of the expected 3.`
+            } instead of the expected 5.`
           )
         }
       })

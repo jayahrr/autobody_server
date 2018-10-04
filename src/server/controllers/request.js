@@ -127,6 +127,7 @@ exports.findNearbyRequestsByLocation = async (req, res) => {
 
   try {
     const results = await Request.find({
+      active: true,
       state: 'New',
       service_location: {
         $near: {

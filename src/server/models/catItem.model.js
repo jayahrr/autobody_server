@@ -9,25 +9,42 @@ const CatalogItemSchema = BaseSchema.extend(
       type: Boolean,
       default: true
     },
+
     order: {
       type: Number,
       default: ''
     },
+
     title: {
       type: String,
       required: true,
       minlength: 1
     },
+
     description: {
       type: String,
       default: ''
     },
+
+    price: {
+      type: Number,
+      default: 0 // need to store as cents
+    },
+
+    duration: {
+      type: Number,
+      default: 0 // need to store as milliseconds
+    },
+
     thumbnail: Buffer,
+
     type: {
       type: String,
       default: 'cat_item'
     },
+
     categories: [{ ref: 'Catalog', type: Schema.ObjectId }],
+
     attrs: [
       {
         name: String,

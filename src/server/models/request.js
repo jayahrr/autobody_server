@@ -13,15 +13,37 @@ const RequestSchema = BaseSchema.extend(
       default: true
     },
 
+    actual_start: {
+      type: Date
+    },
+
+    actual_end: {
+      type: Date
+    },
+
+    cartItemIds: [{ type: String }],
+
+    closed: {
+      type: Date
+    },
+
+    description: {
+      type: String,
+      default: ''
+    },
+
     number: {
       type: String,
       required: true,
       minlength: 1
     },
 
-    state: {
-      type: String,
-      default: 'New'
+    planned_start: {
+      type: Date
+    },
+
+    planned_end: {
+      type: Date
     },
 
     requester_id: {
@@ -33,8 +55,6 @@ const RequestSchema = BaseSchema.extend(
       ref: 'VehicleInstances',
       type: Schema.ObjectId
     },
-
-    cartItemIds: [{ type: String }],
 
     reqItemIds: [{ ref: 'Requests', type: Schema.ObjectId }],
 
@@ -63,9 +83,9 @@ const RequestSchema = BaseSchema.extend(
       default: ''
     },
 
-    description: {
+    state: {
       type: String,
-      default: ''
+      default: 'New'
     },
 
     type: {

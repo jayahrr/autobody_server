@@ -11,50 +11,65 @@ const VehicleInstanceSchema = BaseSchema.extend(
       type: Boolean,
       default: true
     },
+
     name: {
       type: String,
       required: true,
       minlength: 1
     },
+
+    title: {
+      type: String,
+      default: ''
+    },
+
     vin: {
       type: String,
       uppercase: true,
       maxlength: 20,
       default: ''
     },
+
     owner: {
       ref: 'Users',
       type: Schema.ObjectId,
       required: true
     },
+
     year: {
       type: Number,
       minlength: 4,
       maxlength: 4,
       default: 1970
     },
+
     make: {
       type: String,
       default: ''
     },
+
     model: {
       type: String,
       default: ''
     },
+
     manufacturer: {
       type: String,
       default: ''
     },
+
     current_location: {
       type: String,
       default: ''
     },
+
     services: [
       {
         ref: 'Requests',
         type: Schema.ObjectId
       }
     ],
+
     last_services: [
       {
         ref: 'Requests',

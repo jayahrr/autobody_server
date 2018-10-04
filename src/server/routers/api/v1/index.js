@@ -14,5 +14,6 @@ router.use('/catalog_items', require('./catalog_items'))
 router.use('/catalog', require('./catalog'))
 router.use('/requests', require('./requests'))
 router.use('/requestItems', require('./requestItems'))
+router.use('/estimates', require('./estimates'))
 
 module.exports = router

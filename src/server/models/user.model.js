@@ -145,26 +145,28 @@ UserSchema.pre('save', function(next) {
   next()
 })
 
-UserSchema.methods.toJSON = function() {
-  let user = this,
-    userObject = user.toObject(),
-    userPublic = [
-      '_id',
-      'sys_created',
-      'active',
-      'name',
-      'primary_location',
-      'primary_address',
-      'current_location',
-      'current_address',
-      'email',
-      'phone',
-      'username',
-      'service_lines'
-    ]
+// UserSchema.methods.toJSON = function() {
+//   let user = this,
+//     userObject = user.toObject(),
+//     userPublic = [
+//       '_id',
+//       'sys_created',
+//       'active',
+//       'name',
+//       'first_name',
+//       'last_name',
+//       'primary_location',
+//       'primary_address',
+//       'current_location',
+//       'current_address',
+//       'email',
+//       'phone',
+//       'username',
+//       // 'service_lines'
+//     ]
 
-  return _.pick(userObject, userPublic)
-}
+//   return _.pick(userObject, userPublic)
+// }
 
 UserSchema.methods.generateAuthToken = function() {
   let user = this,
@@ -274,6 +276,29 @@ const ServicerSchema = UserSchema.extend(
   },
   { collection: 'Users' }
 )
+
+ServicerSchema.methods.toJSON = function() {
+  let user = this,
+    userObject = user.toObject(),
+    userPublic = [
+      '_id',
+      'sys_created',
+      'active',
+      'name',
+      'first_name',
+      'last_name',
+      'primary_location',
+      'primary_address',
+      'current_location',
+      'current_address',
+      'email',
+      'phone',
+      'username',
+      'service_lines'
+    ]
+
+  return _.pick(userObject, userPublic)
+}
 
 // Create the data models
 const User = mongoose.model('User', UserSchema)
