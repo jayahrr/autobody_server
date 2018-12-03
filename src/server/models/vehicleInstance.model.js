@@ -100,7 +100,7 @@ VehicleInstanceSchema.post('save', function() {
       doc
         .save()
         .catch(e =>
-          console.log(
+          console.error(
             'Something when wrong when updating vehicle instances\' related customer record',
             e
           )
@@ -119,7 +119,7 @@ VehicleInstanceSchema.pre('remove', function(next) {
         doc
           .save()
           .catch(e =>
-            console.log('Something went wrong removing owner ids!', e)
+            console.error('Something went wrong removing owner ids!', e)
           )
       }
     })

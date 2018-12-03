@@ -1,6 +1,8 @@
-const _ = require('lodash'),
-  { VehicleInstance } = require('./../models/vehicleInstance.model'),
-  { ObjectID } = require('mongodb')
+const _ = require('lodash')
+const { VehicleInstance } = require('./../models/vehicleInstance.model')
+const { Request } = require('./../models/request')
+const { RequestItem } = require('./../models/requestItem')
+const { ObjectID } = require('mongodb')
 
 const apiErrorMsg = (verb, subject, error) => {
   return { message: `Unable to ${verb} the ${subject}`, error }
@@ -80,7 +82,7 @@ exports.findById = (req, res) => {
 }
 
 // PUT    update a vehicle instance by id
-exports.findByIdAndUpdate = (req, res) => {
+exports.findByIdAndUpdate = async (req, res) => {
   const id = req.params.id
   if (!id) {
     return res.status(400).send('No ID specified')
@@ -90,25 +92,50 @@ exports.findByIdAndUpdate = (req, res) => {
     return res.status(400).send('Invalid ID')
   }
 
-  var body = _.pick(req.body, ['name', 'vin', 'year', 'make', 'model'])
+  var body = _.pick(req.body, [
+    'name',
+    'vin',
+    'year',
+    'make',
+    'model',
+    'owner',
+    'sys_updated_by',
+    'sys_created_by'
+  ])
+
   if (!body.name) {
     return res.status(400).send('Missing required parameter(s)')
   }
 
-  VehicleInstance.findByIdAndUpdate(id, body)
-    .then(doc => {
-      if (!doc) {
-        return res.status(400).send('Unable to find Vehicle Instance by ID')
+  if (typeof body.year !== 'number') {
+    body.year = Number(body.year)
+  }
+
+  try {
+    const vi = await VehicleInstance.findByIdAndUpdate(id, body, {
+      new: true
+    }).lean()
+    if (!vi) {
+      return res.status(400).send('Unable to find Vehicle Instance by ID')
+    }
+    vi.services = await Request.find({ requester_vehicle_id: vi._id }).lean()
+    if (vi.services && vi.services.length) {
+      for (let index = 0; index < vi.services.length; index++) {
+        const service = vi.services[index]
+        service.request_items = await RequestItem.find({
+          request_id: service._id
+        }).lean()
       }
-      res.json(doc)
-    })
-    .catch(e =>
-      res.status(400).send(apiErrorMsg('get', 'vehicle instance by ID', e))
-    )
+    }
+    res.json(vi)
+  } catch (error) {
+    res.status(400).send(apiErrorMsg('get', 'vehicle instance by ID', error))
+    console.log('error: ', error)
+  }
 }
 
 // DELETE delete a vehicle instance by id
-exports.findByIdAndRemove = (req, res) => {
+exports.findByIdAndRemove = async (req, res) => {
   const id = req.params.id
   if (!id) {
     return res.status(400).send('Missing version or ID')
@@ -118,16 +145,10 @@ exports.findByIdAndRemove = (req, res) => {
     return res.status(400).send('Invalid ID')
   }
 
-  VehicleInstance.findById(id)
-    .then(doc => {
-      if (!doc) {
-        return res.status(400).send('Unable to find Vehicle Instance by ID')
-      }
-
-      doc
-        .remove()
-        .then(() => res.json(doc))
-        .catch(e => res.status(400).send(e))
-    })
-    .catch(e => res.status(400).send(e))
+  try {
+    const instance = await VehicleInstance.findOneAndRemove({ _id: id })
+    return res.json(instance)
+  } catch (error) {
+    return apiErrorMsg('delete', 'VehicleInstance', error)
+  }
 }

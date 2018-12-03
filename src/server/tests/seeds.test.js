@@ -1,16 +1,16 @@
-const app = require('./../server').app,
-  request = require('supertest'),
-  // assert  = require('assert'),
-  { ObjectID } = require('mongodb'),
-  { Customer } = require('./../models/user.model'),
-  { Servicer } = require('./../models/user.model'),
-  { Vehicle } = require('./../models/vehicle.model'),
-  { VehicleInstance } = require('./../models/vehicleInstance.model'),
-  { Catalog } = require('./../models/catalog.model'),
-  { CatalogCategory } = require('./../models/catCategory.model'),
-  { CatalogItem } = require('./../models/catItem.model'),
-  { Request } = require('./../models/request'),
-  { RequestItem } = require('./../models/requestItem')
+const app = require('./../server').app
+const request = require('supertest')
+// assert  = require('assert'),
+const { ObjectID } = require('mongodb')
+const { Customer } = require('./../models/user.model')
+const { Servicer } = require('./../models/user.model')
+const { Vehicle } = require('./../models/vehicle.model')
+const { VehicleInstance } = require('./../models/vehicleInstance.model')
+const { Catalog } = require('./../models/catalog.model')
+const { CatalogCategory } = require('./../models/catCategory.model')
+const { CatalogItem } = require('./../models/catItem.model')
+const { Request } = require('./../models/request')
+const { RequestItem } = require('./../models/requestItem')
 
 const Customers = [
   {
@@ -19,7 +19,13 @@ const Customers = [
     last_name: 'smith',
     email: 'jane@example.com',
     phone: '555-555-5555',
-    password: 'abc123'
+    password: 'abc123',
+    primary_address: '8414 Devenir Ave. Downey, CA 90242',
+    primary_location: {
+      type: 'Point',
+      coordinates: [33.916427, -118.147419]
+    }
+    // type: 'Customer'
   },
   {
     _id: new ObjectID(),
@@ -28,6 +34,7 @@ const Customers = [
     email: 'joe@example.com',
     phone: '555-555-4444',
     password: 'abc123'
+    // type: 'Customer'
   },
   {
     _id: new ObjectID(),
@@ -36,6 +43,7 @@ const Customers = [
     email: 'jack@example.com',
     phone: '555-555-3333',
     password: 'abc123'
+    // type: 'Customer'
   }
 ]
 
@@ -89,7 +97,7 @@ const Catalogs = [
     _id: new ObjectID(),
     title: 'AutoBuddy Catalog',
     description:
-      'A service catalog containing all the services that AutoBuddy\'s can provide.'
+      "A service catalog containing all the services that AutoBuddy's can provide."
   }
 ]
 
@@ -99,7 +107,7 @@ const CatalogCategories = [
     order: 0,
     title: 'Engine Maintenance',
     description:
-      'Services related to the improvement or maintenance of the vehicle\'s engine',
+      "Services related to the improvement or maintenance of the vehicle's engine",
     catalog: Catalogs[0]._id
   },
   {
@@ -107,7 +115,7 @@ const CatalogCategories = [
     order: 1,
     title: 'Tires',
     description:
-      'Services related to the improvement or maintenance of the vehicle\'s tires',
+      "Services related to the improvement or maintenance of the vehicle's tires",
     catalog: Catalogs[0]._id
   },
   {
@@ -115,7 +123,7 @@ const CatalogCategories = [
     order: 2,
     title: 'Autobody maintenance',
     description:
-      'Services related to the improvement or maintenance of the vehicle\'s body parts',
+      "Services related to the improvement or maintenance of the vehicle's body parts",
     catalog: Catalogs[0]._id
   },
   {
@@ -123,7 +131,7 @@ const CatalogCategories = [
     order: 3,
     title: 'Batteries & Electrical',
     description:
-      'Services related to the replacement of the vehicle\'s batteries or installment of electric wiring.',
+      "Services related to the replacement of the vehicle's batteries or installment of electric wiring.",
     catalog: Catalogs[0]._id
   }
 ]
@@ -148,7 +156,7 @@ const CatalogItems = [
   {
     _id: new ObjectID(),
     title: 'Fix broken door handle',
-    description: 'Replace, fix, or remove your vehicle\'s door handle',
+    description: "Replace, fix, or remove your vehicle's door handle",
     categories: [CatalogCategories[2]._id],
     price: 5500,
     duration: 3600000
@@ -157,7 +165,7 @@ const CatalogItems = [
     _id: new ObjectID(),
     title: 'Battery Replacement',
     description:
-      'Replace your car\'s battery.' +
+      "Replace your car's battery." +
       'Price includes cost of the new battery and disposal of the old one.',
     categories: [CatalogCategories[3]._id],
     price: 5000,
@@ -207,17 +215,13 @@ const Requests = [
     servicer_id: Servicers[0]._id,
     requester_id: Customers[0]._id,
     requester_vehicle_id: VehicleInstances[0]._id,
-    cartItemIds: [
-      CatalogItems[0]._id,
-      CatalogItems[1]._id,
-      CatalogItems[2]._id
-    ],
+    cartItems: [CatalogItems[0], CatalogItems[1], CatalogItems[2]],
     service_location: {
       type: 'Point',
       coordinates: [-122.03164178878069, 37.337030655817145] // longitude, latitude
     },
     service_date: '2018-09-13T12:30:00.011Z',
-    short_description: '3 items',
+    short_description: '3 items to service',
     description: 'Car is pretty messed up.'
   },
   {
@@ -227,13 +231,13 @@ const Requests = [
     servicer_id: Servicers[0]._id,
     requester_id: Customers[0]._id,
     requester_vehicle_id: VehicleInstances[0]._id,
-    cartItemIds: [CatalogItems[1]._id, CatalogItems[2]._id],
+    cartItems: [CatalogItems[1], CatalogItems[2]],
     service_location: {
       type: 'Point',
       coordinates: [-2.5469, 48.5917]
     },
     service_date: '2018-09-30T12:30:00.011Z',
-    short_description: '2 items',
+    short_description: '2 items to service',
     description: 'Just my typical changes needed.'
   },
   {
@@ -242,7 +246,7 @@ const Requests = [
     state: 'New',
     requester_id: Customers[1]._id,
     requester_vehicle_id: VehicleInstances[0]._id,
-    cartItemIds: [CatalogItems[0]._id],
+    cartItems: [CatalogItems[0]],
     service_location: {
       type: 'Point',
       coordinates: [-122.0312186, 37.33233141]
@@ -253,79 +257,23 @@ const Requests = [
   }
 ]
 
-// const RequestItems = [
-//   {
-//     _id: new ObjectID(),
-//     number: 'RITM0001001',
-//     short_description: CatalogItems[0].title,
-//     description: '',
-//     state: 'New',
-//     request_id: Requests[0]._id,
-//     catalog_item_id: CatalogItems[0]._id
-//   },
-//   {
-//     _id: new ObjectID(),
-//     number: 'RITM0001002',
-//     short_description: CatalogItems[1].title,
-//     description: 'Testing description 00',
-//     state: 'New',
-//     request_id: Requests[1]._id,
-//     catalog_item_id: CatalogItems[1]._id
-//   },
-//   {
-//     _id: new ObjectID(),
-//     number: 'RITM0001003',
-//     short_description: CatalogItems[2].title,
-//     description: 'Testing more descriptions 00',
-//     state: 'New',
-//     request_id: Requests[2]._id,
-//     catalog_item_id: CatalogItems[2]._id
-//   }
-// ]
-
-before(done => {
-  Customer.remove({}).then(() => {
-    return Customer.create(Customers)
+describe('SEEDING DATABASE', function() {
+  before(async function() {
+    this.enableTimeouts(false)
+    try {
+      await Customer.create(Customers)
+      await Vehicle.insertMany(Vehicles)
+      await VehicleInstance.create(VehicleInstances)
+      await Catalog.insertMany(Catalogs)
+      await CatalogCategory.create(CatalogCategories)
+      await CatalogItem.create(CatalogItems)
+      await Request.create(Requests)
+      await Servicer.create(Servicers)
+    } catch (error) {
+      console.log('error: ', error)
+    }
   })
 
-  Vehicle.remove({}).then(() => {
-    return Vehicle.insertMany(Vehicles)
-  })
-
-  VehicleInstance.remove({}).then(() => {
-    return VehicleInstance.create(VehicleInstances)
-  })
-
-  Catalog.remove({}).then(() => {
-    return Catalog.insertMany(Catalogs)
-  })
-
-  CatalogCategory.remove({}).then(() => {
-    return CatalogCategory.create(CatalogCategories)
-  })
-
-  CatalogItem.remove({}).then(() => {
-    return CatalogItem.create(CatalogItems)
-  })
-
-  Request.remove({}).then(() => {
-    return Request.create(Requests)
-  })
-
-  Servicer.remove({}).then(() => {
-    return Servicer.create(Servicers)
-  })
-
-  // .then(() => done())
-
-  RequestItem.remove({})
-    // .then(() => {
-    //   return RequestItem.insertMany(RequestItems)
-    // })
-    .then(() => done())
-})
-
-describe('SEEDING DATABASE', () => {
   it('should return a login router site message', done => {
     request(app)
       .get('/login/')
@@ -334,16 +282,18 @@ describe('SEEDING DATABASE', () => {
       .expect(function(res) {
         if (res.body.message != 'hooray! welcome to our router site!') {
           throw new Error(
-            `Message content is incorrect; found '${res.body.message}' instead`
+            `Message content is incorrect; found "${res.body.message}" instead`
           )
         }
       })
       .expect(200, done)
   })
+
   it('should return 3 new customer records', done => {
     request(app)
-      .get('/api/v1/customers')
+      .get('/api/v1/users')
       .set('Accept', 'application/json')
+      .set('x-type', 'Customer')
       .expect('Content-Type', 'application/json; charset=utf-8')
       .expect(function(res) {
         if (res.body.length != 3) {
@@ -354,6 +304,7 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
+
   it('should return 3 new vehicle records', done => {
     request(app)
       .get('/api/v1/vehicles')
@@ -368,6 +319,7 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
+
   it('should return 1 new vehicle instance record', done => {
     request(app)
       .get('/api/v1/vehicleInstances')
@@ -384,6 +336,7 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
+
   it('should return 1 new catalog record', done => {
     request(app)
       .get('/api/v1/catalog')
@@ -398,6 +351,7 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
+
   it('should return 4 new catalog category records', done => {
     request(app)
       .get('/api/v1/catalog_categories')
@@ -414,6 +368,7 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
+
   it('should return 5 new catalog item records', done => {
     request(app)
       .get('/api/v1/catalog_items')
@@ -430,6 +385,7 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
+
   it('should return 3 new request records', done => {
     request(app)
       .get('/api/v1/requests')
@@ -444,6 +400,7 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
+
   it('should return 6 new request item records', done => {
     request(app)
       .get('/api/v1/requestItems')
@@ -460,10 +417,12 @@ describe('SEEDING DATABASE', () => {
       })
       .expect(200, done)
   })
+
   it('should return 2 new servicer records', done => {
     request(app)
-      .get('/api/v1/servicers')
+      .get('/api/v1/users')
       .set('Accept', 'application/json')
+      .set('x-type', 'Servicer')
       .expect('Content-Type', 'application/json; charset=utf-8')
       .expect(function(res) {
         if (res.body.length != 2) {

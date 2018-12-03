@@ -3,6 +3,7 @@ const { Servicer, Customer } = require('./../models/user.model')
 const { Request } = require('./../models/request')
 const { RequestItem } = require('./../models/requestItem')
 const { CatalogItem } = require('./../models/catItem.model')
+const { VehicleInstance } = require('./../models/vehicleInstance.model')
 const { ObjectID } = require('mongodb')
 
 const apiErrorMsg = (verb, subject, error) => {
@@ -125,7 +126,6 @@ exports.updateMe = async (req, res) => {
   }
 
   let user
-  console.log('req.body: ', req.body)
   try {
     user = await Servicer.findByIdAndUpdate(userID, req.body.update, {
       new: true
@@ -176,7 +176,6 @@ exports.findByUsername = async (req, res) => {
 // GET find a Servicer's Work Requests
 exports.findMyWork = async (req, res) => {
   const servicer_id = req.header('x-un')
-  console.log('servicer_id: ', servicer_id)
   let requests = []
 
   if (!servicer_id) {
@@ -199,10 +198,17 @@ exports.findMyWork = async (req, res) => {
           request.request_items = await RequestItem.find({
             request_id: request._id,
             active: true
-          })
+          }).lean()
         }
         if (request.requester_id) {
-          request.requester = await Customer.findById(request.requester_id)
+          request.requester = await Customer.findById(
+            request.requester_id
+          ).lean()
+        }
+        if (request.requester_vehicle_id) {
+          request.requester_vehicle = await VehicleInstance.findById(
+            request.requester_vehicle_id
+          ).lean()
         }
       }
     }
@@ -236,7 +242,7 @@ exports.getMyLocation = async (req, res) => {
 
 exports.setMyLocation = async (req, res) => {
   const servicer_id = req.header('x-un')
-  console.log('servicer_id: ', servicer_id)
+  // console.log('servicer_id: ', servicer_id)
   let location = null
   let body = _.pick(req.body, ['current_location', 'current_address'])
 

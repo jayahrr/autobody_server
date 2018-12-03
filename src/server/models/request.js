@@ -21,10 +21,23 @@ const RequestSchema = BaseSchema.extend(
       type: Date
     },
 
-    cartItemIds: [{ type: String }],
+    cartItems: {
+      type: Array,
+      default: []
+    },
 
     closed: {
       type: Date
+    },
+
+    cost_estimate: {
+      type: Number,
+      default: 0 // need to store as cents
+    },
+
+    cost_true: {
+      type: Number,
+      default: 0 // need to store as cents
     },
 
     description: {
@@ -123,14 +136,17 @@ RequestSchema.pre('save', function(next) {
       servicer_id: request.servicer_id
     }
 
-    request.cartItemIds.forEach(id => {
+    request.cartItems.forEach(ci => {
+      let id = ci._id
       if (!ObjectId.isValid(id)) ObjectId(id)
       ritm.catalog_item_id = id
       ritm.servicer_id = request.servicer_id
+      ritm.short_description = ci.title
       let newRITM = new RequestItem(ritm)
       return newRITM.save().then(doc => {
         request.reqItemIds.push(doc._id)
-        if (request.reqItemIds.length === request.cartItemIds.length) {
+        if (request.reqItemIds.length === request.cartItems.length) {
+          request.cartItems = undefined
           next()
         }
       })
@@ -195,6 +211,24 @@ RequestSchema.pre('remove', function(next) {
     next()
   }
 })
+
+// RequestSchema.pre('findOne', function() {
+//   console.log('this: ')
+// })
+
+// RequestSchema.post('findOne', async request => {
+//   request.requestItems = []
+//   if (request.reqItemIds && request.reqItemIds.length > 0) {
+//     for (let index = 0; index < request.reqItemIds.length; index++) {
+//       const ritmID = request.reqItemIds[index]
+//       const ritm = await RequestItem.findById(ritmID)
+//       // console.log('ritm: ', ritm)
+//       if (ritm) {
+//         request.requestItems.push(ritm)
+//       }
+//     }
+//   }
+// })
 
 // Create the Service Request Model
 const Request = mongoose.model('request', RequestSchema)

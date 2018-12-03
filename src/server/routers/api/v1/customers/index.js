@@ -1,7 +1,7 @@
 // call the packages we need
-const express = require('express'),
-  CUSTOMERS = require('./../../../../controllers/user.controller'),
-  { authenticate } = require('./../../../../middleware/authenticate')
+const express = require('express')
+const CUSTOMERS = require('./../../../../controllers/user.controller')
+const { authenticate } = require('./../../../../middleware/authenticate')
 
 // ROUTES FOR OUR API
 // ----------------------------------------------------
@@ -43,7 +43,8 @@ router
 
   // .all( authenticate )
   .post(CUSTOMERS.createMyServiceRequest)
-  .get(CUSTOMERS.findMyServices)
+  .get(CUSTOMERS.findMyRequests)
+  .put(CUSTOMERS.updateMyRequest)
 
 // /api/v1/customers/:id
 router

@@ -234,7 +234,7 @@ const CustomerSchema = UserSchema.extend(
   {
     type: {
       type: String,
-      default: 'customer'
+      default: 'Customer'
     },
 
     vehicle_instances: [
